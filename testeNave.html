@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <title>INTERACTIONS</title>
+    <style>
+        body{
+            margin:0;
+            padding:0;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" style="border:solid 1px green">
+        Your browser does not support HTML5 Canvas.
+    </canvas>
+
+    <script>
+        const canvas = document.querySelector("#canvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight
+
+        const W = canvas.width;
+        const H = canvas.height;
+
+        let x = W / 2;
+        let y = H / 2;
+
+        //circle properties
+        ctx.fillStyle = "blue";
+        const R = 20;
+
+        //setas
+        let upKey = false;
+        let downKey = false;
+        let leftKey = false;
+        let rightKey = false;
+        let space = false;
+
+        let spaceTimer = 0;
+        let timer
+
+        function KeyPressed(e){
+            console.log(e.key);
+            if (e.key == 'w'){
+                upKey = true;
+            }
+            if (e.key == 's'){
+                downKey = true;
+            }
+            if (e.key == 'a'){
+                leftKey = true;
+            }
+            if (e.key == 'd'){
+                rightKey = true;
+            }
+            if (e.key == ' ' && spaceTimer == 0){
+                space = true;
+                spaceTimer = 5;
+                timer = window.setInterval(teleportTimer, 1000);
+            }
+            if (e.key == 'Enter'){
+                render();
+                fullscreen();
+            }
+        }
+
+        function KeyReleased(e){
+            switch (e.key){
+                case "w":
+                    upKey = false; ;
+                    break;
+                case "s":
+                    downKey = false;
+                    break;
+                case "a":
+                    leftKey = false;
+                    break;
+                case "d":
+                    rightKey = false;
+                    break;
+                case ' ':
+                    space = false;
+                    break;
+            }
+        }
+
+        window.addEventListener('keydown', KeyPressed);
+        window.addEventListener('keyup', KeyReleased);
+
+        function render(){
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            //mover o circulo
+            if (upKey && y - R > 0) y--;
+            if (downKey && y + R < canvas.height) y++;
+            if (leftKey && x - R > 0) x--;
+            if (rightKey && x + R < canvas.width) x++;
+            if (space){
+                teleport()
+                space = false;
+            }
+
+            ctx.beginPath();
+            ctx.arc(x, y, R, 0, Math.PI * 2);
+            ctx.fill();
+
+            window.requestAnimationFrame(render);
+        }
+        
+        function teleport(){
+            x = Math.floor(Math.random() * (canvas.width - 2*R) + R);
+            y = Math.floor(Math.random() * (canvas.height - 2*R) + R);
+        }
+
+        function teleportTimer(){
+            console.log(spaceTimer);
+            spaceTimer--;
+            if (spaceTimer == 0){
+                clearInterval(timer);
+            }
+        }
+
+        
+
+        //full screen
+        function fullscreen(){
+                var el = document.getElementById('canvas');
+
+                if(el.webkitRequestFullScreen) {
+                el.webkitRequestFullScreen();
+                }
+                else {
+                    el.mozRequestFullScreen();
+                }      
+        }
+        
+        function ecraInicial(){
+            let text = 'ENTER'
+            ctx.font = '50px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(text, x, y)
+
+            window.addEventListener('Enter', render)
+        }
+
+        ecraInicial()
+
+        canvas.addEventListener('click', (e) => {
+            
+        })
+    </script>
+</body>
+
+</html>
