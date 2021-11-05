@@ -22,7 +22,7 @@
         const ctx = canvas.getContext("2d");
 
         canvas.width  = window.innerWidth;
-        canvas.height = window.innerHeight
+        canvas.height = window.innerHeight + 20
 
         const W = canvas.width;
         const H = canvas.height;
@@ -44,8 +44,12 @@
         let spaceTimer = 0;
         let timer
 
+        //rato
+        let click = false;  
+        let xR;
+        let yR;
+
         function KeyPressed(e){
-            console.log(e.key);
             if (e.key == 'w'){
                 upKey = true;
             }
@@ -91,26 +95,6 @@
 
         window.addEventListener('keydown', KeyPressed);
         window.addEventListener('keyup', KeyReleased);
-
-        function render(){
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            //mover o circulo
-            if (upKey && y - R > 0) y--;
-            if (downKey && y + R < canvas.height) y++;
-            if (leftKey && x - R > 0) x--;
-            if (rightKey && x + R < canvas.width) x++;
-            if (space){
-                teleport()
-                space = false;
-            }
-
-            ctx.beginPath();
-            ctx.arc(x, y, R, 0, Math.PI * 2);
-            ctx.fill();
-
-            window.requestAnimationFrame(render);
-        }
         
         function teleport(){
             x = Math.floor(Math.random() * (canvas.width - 2*R) + R);
@@ -125,7 +109,110 @@
             }
         }
 
-        
+        //teste asteroides
+
+        class Asteroides{
+            constructor(x, y, r, d, c){
+                this.x = x;
+                this.y = y;
+                this.dX = 2 * Math.cos(d);
+                this.dY = 2 * Math.sin(d);
+                this.R = r;
+                this.c = c;
+            }
+
+            draw(){
+                ctx.fillStyle = 'White';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.R, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            update(){
+                if (this.x < 0 - this.R) this.x = W + this.R
+                if (this.x > W + this.R) this.x = 0 - this.R
+                if (this.y < 0 - this.R)  this.y = H + this.R
+                if (this.y > H + this.R) this.y = 0 - this.R
+
+                this.x += this.dX;
+                this.y += this.dY;
+            }
+        }
+
+        let b = new Array();
+        for (let i = 0; i < 10; i++) {
+            let R = Math.floor(Math.random() * 256);
+            let G = Math.floor(Math.random() * 256);
+            let B = Math.floor(Math.random() * 256);
+            let color = `rgb(${R},${G},${B})`;
+
+            let xInit = 20 + Math.random() * (W - 2 * 20);
+            let yInit = 20 + Math.random() * (H - 2 * 20);
+
+            let direction = Math.random() * 2 * Math.PI;
+
+            b.push(new Asteroides(xInit, yInit, 10, direction, color))
+        }
+
+        function render(e){
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            //mover a nave
+            if (upKey) {
+                y -= 3;
+                if (y < 0 - R){
+                    y = H + R;
+                }
+            }
+            if (downKey) {
+                y += 3;
+                if (y > H + R){
+                    y = 0 - R;
+                }
+            }
+            if (leftKey) {
+                x -= 3;
+                if (x < 0 - R){
+                    x = W + R;
+                }
+            }
+            if (rightKey) {
+                x += 3;
+                if (x > W + R){
+                    x = 0 - R;
+                }
+            }
+            if (space){
+                teleport()
+                space = false;
+            }
+
+            if (click){
+                disparo(x, y)
+                console.log(`Tiro de ${x}:${y} para ${xR}:${yR}`)
+            }
+
+            ctx.beginPath();
+            ctx.arc(x, y, R, 0, Math.PI * 2);
+            ctx.fill();
+
+            //mover os asteroides
+            b.forEach( ball => {
+                ball.draw();
+                ball.update();
+            });
+
+            window.requestAnimationFrame(render);
+        }
+
+        //disparo
+        function disparo(x, y){
+            ctx.strokeStyle = 'blue';
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(xR, yR);
+            ctx.stroke();
+        }
 
         //full screen
         function fullscreen(){
@@ -150,9 +237,15 @@
 
         ecraInicial()
 
-        canvas.addEventListener('click', (e) => {
-            
+        canvas.addEventListener('mousedown', (e) => {
+            click = true
+            xR = e.clientX;
+            yR = e.clientY;
         })
+
+        canvas.addEventListener('mouseup', () =>{
+            click = false;
+        } )
     </script>
 </body>
 
