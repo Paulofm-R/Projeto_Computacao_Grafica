@@ -9,6 +9,10 @@
             margin:0;
             padding:0;
         }
+
+        body{ 
+            cursor:crosshair; 
+        }
     </style>
 </head>
 
@@ -48,6 +52,10 @@
         let click = false;  
         let xR;
         let yR;
+
+        //tiros
+        let tiroTimer = true;
+        let timeTiro
 
         function KeyPressed(e){
             if (e.key == 'w'){
@@ -139,7 +147,7 @@
             }
         }
 
-        let b = new Array();
+        let a = [];
         for (let i = 0; i < 10; i++) {
             let R = Math.floor(Math.random() * 256);
             let G = Math.floor(Math.random() * 256);
@@ -151,7 +159,7 @@
 
             let direction = Math.random() * 2 * Math.PI;
 
-            b.push(new Asteroides(xInit, yInit, 10, direction, color))
+            a.push(new Asteroides(xInit, yInit, 10, direction, color))
         }
 
         function render(e){
@@ -187,9 +195,10 @@
                 space = false;
             }
 
-            if (click){
-                disparo(x, y)
-                console.log(`Tiro de ${x}:${y} para ${xR}:${yR}`)
+            if (click && tiroTimer){
+                tiros.push(new Tiro(x, y, 'White', 5, xR, yR))
+                tiroTimer = false;
+                timeTiro = window.setInterval(timerTiro, 500)
             }
 
             ctx.beginPath();
@@ -197,21 +206,61 @@
             ctx.fill();
 
             //mover os asteroides
-            b.forEach( ball => {
-                ball.draw();
-                ball.update();
+            a.forEach( asteroide => {
+                asteroide.draw();
+                asteroide.update();
             });
+
+            tiros.forEach(tiro =>{
+                tiro.draw();
+                tiro.update();
+            })
 
             window.requestAnimationFrame(render);
         }
 
         //disparo
-        function disparo(x, y){
-            ctx.strokeStyle = 'blue';
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(xR, yR);
-            ctx.stroke();
+        class Tiro{
+            constructor(x, y, c, t, xDir, yDir){
+                this.x = x;
+                this.y = y;
+                this.c = c;
+                this.t = t;
+                this.xDir = xDir;
+                this.yDir = yDir
+            }
+
+            draw(){
+                ctx.fillStyle = this.c;
+                ctx.beginPath();
+                ctx.fillRect(this.x, this.y, this.t, this.t);
+            }
+
+            update(){
+                if(this.xDir < this.x){
+                    this.x -= 2;
+                }
+                if (this.xDir > this.x) {
+                    this.x += 2;
+                }
+                if (this.yDir < this.y) {
+                    this.y -= 2;
+                }
+                if (this.yDir > this.y) {
+                    this.y += 2;
+                }
+
+                if (this.xDir == this.x && this.yDir == this.y) {
+                    tiros.shift();
+                }
+            }
+        }
+
+        let tiros = [];
+
+        function timerTiro(){
+            tiroTimer = true;
+            window.clearInterval(timeTiro);
         }
 
         //full screen
