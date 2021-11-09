@@ -8,10 +8,8 @@
         body{
             margin:0;
             padding:0;
-        }
-
-        body{ 
             cursor:crosshair; 
+            background-color: black;
         }
     </style>
 </head>
@@ -56,6 +54,19 @@
         //tiros
         let tiroTimer = true;
         let timeTiro
+
+        //imagens
+        let imagens = {}
+        loadImage('Nave');
+        loadImage("Meteoro 1");
+        loadImage("Meteoro 2");
+        loadImage("Meteoro 3");
+        loadImage("Meteoro 4");
+
+        function loadImage(name){
+            imagens[name] = new Image();
+            imagens[name].src = 'img/' + name + '.png';
+        }
 
         function KeyPressed(e){
             if (e.key == 'w'){
@@ -117,8 +128,7 @@
             }
         }
 
-        //teste asteroides
-
+        //asteroides
         class Asteroides{
             constructor(x, y, r, d, c){
                 this.x = x;
@@ -132,8 +142,9 @@
             draw(){
                 ctx.fillStyle = 'White';
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.R, 0, 2 * Math.PI);
-                ctx.fill();
+                ctx.drawImage(imagens['Meteoro 3'], this.x, this.y, 120, 68);
+                // ctx.arc(this.x, this.y, this.R, 0, 2 * Math.PI);
+                // ctx.fill();
             }
 
             update(){
@@ -196,14 +207,15 @@
             }
 
             if (click && tiroTimer){
-                tiros.push(new Tiro(x, y, 'White', 5, xR, yR))
+                tiros.push(new Tiro(x+15, y, 'White', 5, xR, yR))
                 tiroTimer = false;
                 timeTiro = window.setInterval(timerTiro, 500)
             }
 
             ctx.beginPath();
-            ctx.arc(x, y, R, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.drawImage(imagens['Nave'], x, y, 35, 69)
+            // ctx.arc(x, y, R, 0, Math.PI * 2);
+            // ctx.fill();
 
             //mover os asteroides
             a.forEach( asteroide => {
@@ -227,7 +239,7 @@
                 this.c = c;
                 this.t = t;
                 this.xDir = xDir;
-                this.yDir = yDir
+                this.yDir = yDir;
             }
 
             draw(){
@@ -253,6 +265,9 @@
                 if (this.xDir == this.x && this.yDir == this.y) {
                     tiros.shift();
                 }
+
+                console.log(`xDir: ${this.xDir}; x: ${this.x}`);
+                console.log(`xDir: ${this.yDir}; x: ${this.y}`);
             }
         }
 
