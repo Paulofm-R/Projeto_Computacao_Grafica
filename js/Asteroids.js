@@ -8,12 +8,11 @@ canvas.height = window.innerHeight - 10;
 const W = canvas.width;
 const H = canvas.height;
 
-//posição inicial da nave
-let x = W / 2;
-let y = H / 2;
+ctx.fillStyle = 'Blue'; //eliminar depois
 
-//array da nave
-let nave = [];
+//posição inicial da nave
+// let x = W / 2;
+// let y = H / 2;
 
 //setas
 let upKey = false;
@@ -50,8 +49,19 @@ let a = [];
 //array de tiros
 let tiros = [];
 
+//array da nave
+let nave = {
+    x: W / 2,
+    y: H / 2,
+    w: 35,
+    h: 69,
+    imagem: imagens['Nave'],
+    vida: true,
+    vidas: 5,
+};
+
 //guardar se esta na tela inical ou não
-let inicio;
+// let inicio;
 
 //classes
 //asteroides
@@ -66,7 +76,11 @@ class Asteroides{
     draw(){
         //desenhar os asteroides
         ctx.beginPath();
+        ctx.fillRect(this.x + 10, this.y + 5, 100, 60)
         ctx.drawImage(imagens['Meteoro 3'], this.x, this.y, 120, 68);
+        // ctx.arc(this.x + 60, this.y + 34, 45, 0, Math.PI * 2); //ponto de colição (mudar/remover depois)
+        // ctx.fill()
+        
     }
 
     update(){
@@ -78,6 +92,8 @@ class Asteroides{
 
         this.x += this.dX;
         this.y += this.dY;
+
+        colisoes(this.x + 10, this.y + 5, 100, 60)  //verificar se um asteroide bateu na nave
     }
 }
 
@@ -115,9 +131,9 @@ class Tiro{
         }
         
         //retirar o tiro quando chegar ao destino
-        // if (this.xDir == this.x && this.yDir == this.y) {
-        //     tiros.shift();
-        // }
+        if (this.xDir == this.x && this.yDir == this.y) {
+            tiros.shift();
+        }
     }
 }
 
@@ -147,10 +163,10 @@ function KeyPressed(e){
         spaceTimer = 5;
         timer = window.setInterval(teleportTimer, 1000);
     }
-    if (e.key == 'Enter' && inicio){
-        render();
-        inicio = false;
-    }
+    // if (e.key == 'Enter' && inicio){
+    //     render();
+    //     inicio = false;
+    // }
 }
 
 //lagar a tecla
@@ -195,16 +211,27 @@ function teleportTimer(){
 //     window.clearInterval(timeTiro);
 // }
 
-//ecra inicial
-function ecraInicial(){
-    ctx.fillStyle = 'Blue';
-    let text = 'ENTER'
-    ctx.font = '50px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(text, x, y)
-
-    inicio = true;
+//colisões
+function colisoes(x, y, w, h){
+    if (x + w < nave.x || x > nave.x + nave.w || y + h < nave.y || y > nave.y + nave.h) {
+        //sem colições
+    } 
+    else {
+        nave.vida = false;  //dar a informação que a nave foi destruida
+        }
+        
 }
+
+// //ecra inicial
+// function ecraInicial(){
+//     ctx.fillStyle = 'Blue';
+//     let text = 'ENTER'
+//     ctx.font = '50px Arial';
+//     ctx.textAlign = 'center';
+//     ctx.fillText(text, W/2, H/2);
+
+//     inicio = true;
+// }
 
 //render
 function render(){
@@ -212,27 +239,27 @@ function render(){
 
     //mover a nave
     if (upKey) {
-        y -= 3;
-        if (y < -69){
-            y = H;
+        nave.y -= 3;
+        if (nave.y < -69){
+            nave.y = H;
         }
     }
     if (downKey) {
-        y += 3;
-        if (y > H){
-            y = -69;
+        nave.y += 3;
+        if (nave.y > H){
+            nave.y = -69;
         }
     }
     if (leftKey) {
-        x -= 3;
-        if (x < -35){
-            x = W;
+        nave.x -= 3;
+        if (nave.x < -35){
+            nave.x = W;
         }
     }
     if (rightKey) {
-        x += 3;
-        if (x > W){
-            x = -35;
+        nave.x += 3;
+        if (nave.x > W){
+            nave.x = -35;
         }
     }
 
@@ -244,13 +271,18 @@ function render(){
 
     //disparar com o click do rato
     if (click){
-        tiros.push(new Tiro(x+15, y, 'White', 5, xR, yR))
+        tiros.push(new Tiro(nave.x+15, nave.y, 'White', 5, xR, yR))
         click = false;
     }
 
     //pintar a nave
-    ctx.beginPath();
-    ctx.drawImage(imagens['Nave'], x, y, 35, 69)
+    if(nave.vida){
+        ctx.beginPath();
+        ctx.fillRect(nave.x + 3, nave.y + 3, 30, 65);
+        ctx.drawImage(nave.imagem, nave.x, nave.y, nave.w, nave.h);
+        // ctx.arc(x + 17.5, y + 34.5, 30, 0, Math.PI * 2);  //ponto de colição (mudar/remover depois)
+        // ctx.fill()
+    }
 
     //desenhar e mover os asteroides
     a.forEach( asteroide => {
@@ -287,4 +319,4 @@ for (let i = 0; i < 10; i++) {
     a.push(new Asteroides(xInit, yInit, direction))
 }
 
-ecraInicial()
+window.onload = () => render()  //chamar a função render depois de carregar a pagina
