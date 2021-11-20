@@ -57,7 +57,7 @@ let nave = {
     colicaoH: -10,
     vida: true,
     vidas: 5,
-    angulo: 0,
+    angulo: -90,
 };
 
 //classes
@@ -233,20 +233,31 @@ function colisoes(obj1, obj2){
         }
 }
 
+//função para ajustar o angulo
+function angulo(){
+    if(nave.angulo >= 360){
+        nave.angulo = nave.angulo - 360;
+    }else if(nave.angulo <= -360){
+        nave.angulo = -360 - nave.angulo;
+    }
+}
+
 //render
 function render(){
+    angulo()
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     //quando a nave tiver vidas
     if(nave.vida){
         //mover a nave
         if (upKey) {
+            console.log(nave.angulo)
             if(nave.angulo == 0){ //frente
                 nave.y -= 3;
                 if (nave.y < -nave.h){
                     nave.y = H;
                 }
-            }else if(nave.angulo<0 || nave.angulo<-90){ // diagonal superior esquerda
+            }else if(nave.angulo<0 || nave.angulo<=-89){ // diagonal superior esquerda
                 nave.y -= 3;
                 nave.x -= 3;
                 if (nave.y < -nave.h){
@@ -263,7 +274,7 @@ function render(){
                  if (nave.y < -nave.h){
                      nave.y = H;
                  }
-             }else if(nave.angulo<-90 || nave.angulo>-180){ //diagonal inferior esquerda
+             }else if(nave.angulo<=-91 || nave.angulo>-180){ //diagonal inferior esquerda
                 nave.y += 3;
                 nave.x -= 3;
                 if (nave.y < -nave.h){
@@ -379,7 +390,7 @@ canvas.addEventListener('mousedown', (e) => {
 })
 
 //criar asteroides 
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 0; i++) {
     let xInit;
     let yInit;
     let direction = Math.random() * 2 * Math.PI;
