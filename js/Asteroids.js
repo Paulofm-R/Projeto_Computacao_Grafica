@@ -50,15 +50,18 @@ let nave = {
     y: H / 2,
     w: 80,
     h: 75,
-    imagem: imagens['Nave'],
-    colicaoX: 12,
-    colicaoY: 5,
-    colicaoW: -25,
-    colicaoH: -10,
+    imagem: imagens['Nave'], 
     vida: true,
     vidas: 5,
     angulo: 0,
+    colisao: {  //correção para as coordenadas de colisao
+        x: -30,
+        y: -30,
+        w: -20,
+        h: -10
+    }
 };
+
 
 //classes
 //asteroides
@@ -102,7 +105,7 @@ class Tiro{
         this.c = c; //cor do tiro
         this.t = t; //tamanho do tiro
         this.dX = 2 * Math.cos(xDir); //direção do tiro em x
-        this.dY = 2* Math.sin(yDir); //direção do tiro em y
+        this.dY = 2* Math.sin(yDir); //direção do tiro em y        
     }
 
     draw(){
@@ -119,7 +122,7 @@ class Tiro{
         // if (this.dY < this.y) this.y -= 5;
         // if (this.dY > this.y) this.y += 5;
 
-        if (this.x < -120) this.x = W
+        if (this.x < -120) this.x = W 
         if (this.x > W) this.x = -120
         if (this.y < -68)  this.y = H
         if (this.y > H) this.y = -68
@@ -220,9 +223,27 @@ function teleportTimer(){
     }
 }
 
-//colisões
-function colisoes(obj1, obj2){
-    if ((Math.floor(obj1.x)) + (obj1.w) < obj2.x || 
+/**
+ * colisões
+ * @param {object} obj1 asteroides 
+ * @param {object} obj2 tiros ou nave
+ * @param {object} nave se a nave
+ * @returns 
+ */
+function colisoes(obj1, obj2, nave = false){
+    if (nave){
+        if ((Math.floor(obj1.x)) + (obj1.w) < (obj2.x + obj2.colisao.x) || 
+        (Math.floor(obj1.x)) > (obj2.x + obj2.colisao.x) + (obj2.w + obj2.colisao.w) ||
+        (Math.floor(obj1.y)) + obj1.h < (obj2.y + obj2.colisao.y) ||
+        (Math.floor(obj1.y)) > (obj2.y + obj2.colisao.y) + (obj2.h + obj2.colisao.h)) {
+        return false;
+    } 
+    else { 
+        return true;
+        }
+    }
+    else{
+        if ((Math.floor(obj1.x)) + (obj1.w) < obj2.x || 
         (Math.floor(obj1.x)) > obj2.x + obj2.w ||
         (Math.floor(obj1.y)) + (obj1.h) < obj2.y ||
         (Math.floor(obj1.y)) > obj2.y + obj2.h) {
@@ -231,6 +252,7 @@ function colisoes(obj1, obj2){
     else { 
         return true;
         }
+    }
 }
 
 //função para ajustar o angulo
@@ -244,69 +266,71 @@ function angulo(){
 
 //render
 function render(){
-    angulo()
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     //quando a nave tiver vidas
     if(nave.vida){
+        angulo() //repor o angulo da nave para 0 quando passar de +/-360
+
         //mover a nave
         if (upKey) {
-            console.log(nave.angulo)
             if(nave.angulo == 0){ //frente
                 nave.y -= 3;
                 if (nave.y < -nave.h){
                     nave.y = H;
                 }
-            }else if(nave.angulo<0 && nave.angulo>-90){ // diagonal superior esquerda
+            }else if((nave.angulo<0 && nave.angulo>-90) || (nave.angulo< 360 && nave.angulo > 270)){ // diagonal superior esquerda
                 nave.y -= 3;
                 nave.x -= 3;
                 if (nave.y < -nave.h){
                     nave.y = H;
                 }
-            }else if(nave.angulo>0 && nave.angulo<90){ //diagonal superior direita
+                if (nave.x < -nave.w){
+                    nave.x = W;
+                }
+            }else if((nave.angulo>0 && nave.angulo<90) || (nave.angulo> -360 && nave.angulo < -270)){ //diagonal superior direita
                  nave.y -= 3;
                  nave.x += 3;
                  if (nave.y < -nave.h){
                      nave.y = H;
                  }
-             }else if(nave.angulo == -90){ //esquerda
+                 if (nave.x > W){
+                    nave.x = -nave.w;
+                }
+             }else if(nave.angulo == -90 || nave.angulo == 270){ //esquerda
                  nave.x -= 3;
-                 if (nave.y < -nave.h){
-                     nave.y = H;
-                 }
-             }else if(nave.angulo<=-91 && nave.angulo>-180){ //diagonal inferior esquerda
+                 if (nave.x < -nave.w){
+                    nave.x = W;
+                }
+             }else if((nave.angulo < -90 && nave.angulo >- 180) || (nave.angulo < 270 && nave.angulo > 180)){ //diagonal inferior esquerda
                 nave.y += 3;
                 nave.x -= 3;
-                if (nave.y < -nave.h){
-                    nave.y = H;
+                if (nave.x < -nave.w){
+                    nave.x = W;
                 }
-            }else if(nave.angulo == 180){ //baixo
+                if (nave.y > H){
+                    nave.y = -nave.h;
+                }
+            }else if(nave.angulo == 180 || nave.angulo == -180){ //baixo
                 nave.y += 3;
-                
-                if (nave.y < -nave.h){
-                    nave.y = H;
+                if (nave.y > H){
+                    nave.y = -nave.h;
                 }
-            }else if(nave.angulo>90 && nave.angulo<180){ //diagonal inferior direita
+            }else if((nave.angulo>90 && nave.angulo<180) || (nave.angulo> -270 && nave.angulo < -180)){ //diagonal inferior direita
                 nave.y += 3;
                 nave.x += 3;
-                if (nave.y < -nave.h){
-                    nave.y = H;
+                if (nave.y > H){
+                    nave.y = -nave.h;
                 }
-            }else if(nave.angulo == 90 && nave.angulo == -270){
+                if (nave.x > W){
+                    nave.x = -nave.w;
+                }
+            }else if(nave.angulo == 90 || nave.angulo == -270){ //direita
                 nave.x += 3;
-                if (nave.y < -nave.h){
-                    nave.y = H;
+                if (nave.x > W){
+                    nave.x = -nave.w;
                 }
             }
-             
-             else{
-                 nave.y += 3;
-                 nave.x -= 3;
-                 if (nave.y < -nave.h){
-                     nave.y = H;
-                 }
-             }
-            
         }
         if (leftKey) {
             //roda o angulo para a esquerda
@@ -315,7 +339,6 @@ function render(){
         if (rightKey) {
             //roda o angulo da nave para a direita
             nave.angulo ++
-
         }
 
         //teleportar a nave
@@ -325,12 +348,12 @@ function render(){
         }
 
         //pintar a nave
-        ctx.beginPath();
         ctx.fillStyle = 'blue' //ponto de colição (mudar/remover depois)
-        ctx.fillRect(nave.x + 12, nave.y + 5, nave.w - 25, nave.h - 10); //ponto de colição (mudar/remover depois)
         ctx.save()
         ctx.translate(nave.x,nave.y)
+        ctx.beginPath();
         ctx.rotate(nave.angulo*Math.PI/180)
+        ctx.fillRect(nave.colisao.x, nave.colisao.y, nave.w + nave.colisao.w, nave.h + nave.colisao.h);  //ponto de colição (mudar/remover depois)
         ctx.drawImage(nave.imagem, -nave.w/2, -nave.h/2, nave.w, nave.h);
         ctx.restore()
 
@@ -355,7 +378,7 @@ function render(){
 
         //nave -> asteroides (colisão)
         for (let a = 0; a < asteroides.length; a++){
-            let colicao = colisoes(asteroides[a], nave);
+            let colicao = colisoes(asteroides[a], nave, true);
 
             if(colicao){ //quando a nave bate contra o asteroide
                 asteroides.splice(a, 1);
@@ -395,6 +418,7 @@ for (let i = 0; i < 10; i++) {
     let yInit;
     let direction = Math.random() * 2 * Math.PI;
 
+    //diferenciar a posição inical do asteroide dependedo da direção
     if(direction < 1 || direction > 5){
         xInit = Math.random() * W/4;
         yInit = Math.random() * H;
