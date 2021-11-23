@@ -8,8 +8,6 @@ canvas.height = window.innerHeight - 10;
 const W = canvas.width;
 const H = canvas.height;
 
-ctx.fillStyle = 'Blue'; //eliminar depois
-
 //setas
 let upKey = false;
 let downKey = false;
@@ -74,7 +72,6 @@ class Asteroides{
         this.img = img; //imagem do asteroide
         this.w = img.width; //largura
         this.h = img.height; //altura
-        this.partir = false;
     }
 
     draw(){
@@ -99,13 +96,14 @@ class Asteroides{
 
 //tiros
 class Tiro{
-    constructor(x, y, c, t, xDir, yDir){
+    constructor(x, y, c, t, xR, yR, anguloTiro){
         this.x = x; //posisão do tiro em x
         this.y = y; //posisão do tiro em y
         this.c = c; //cor do tiro
         this.t = t; //tamanho do tiro
-        this.dX = 2 * Math.cos(xDir); //direção do tiro em x
-        this.dY = 2* Math.sin(yDir); //direção do tiro em y        
+        this.dX = 2 * Math.cos(xR); //direção do tiro em x
+        this.dY = 2* Math.sin(yR); //direção do tiro em y 
+        this.anguloTiro = anguloTiro       
     }
 
     draw(){
@@ -122,18 +120,18 @@ class Tiro{
         // if (this.dY < this.y) this.y -= 5;
         // if (this.dY > this.y) this.y += 5;
 
-        if (this.x < -120) this.x = W 
-        if (this.x > W) this.x = -120
-        if (this.y < -68)  this.y = H
-        if (this.y > H) this.y = -68
+        if (this.x < 0) this.x = W 
+        if (this.x > W) this.x = 0
+        if (this.y < 0)  this.y = H
+        if (this.y > H) this.y = 0
 
-        this.x += this.dX;
-        this.y += this.dY;
-        
+        //disparar para o local em que o rato está localizado
+        this.x += 3* Math.cos(this.anguloTiro)
+        this.y += 3* Math.sin(this.anguloTiro)
         
         //retirar o tiro quando chegar ao destino
-        if (this.xDir == this.x && this.yDir == this.y) {
-            tiros.shift();
+        if (this.xR == this.x && this.yR == this.y) {
+            tiros.shift(); 
         }
     }
 }
@@ -149,9 +147,6 @@ class OVNI{
 
     draw(){
         //desenhar o OVNI
-        ctx.fillStyle = 'blue' //ponto de colição (mudar/remover depois)
-        ctx.beginPath();
-        ctx.fillRect(this.x + 5, this.y + 5, this.w - 10, this.h - 10); //ponto de colição (mudar/remover depois)
         ctx.drawImage(this.img, this.x, this.y);  
     }
 
@@ -193,9 +188,6 @@ function KeyReleased(e){
         case "w":
             upKey = false; ;
             break;
-        case "s":
-            downKey = false;
-            break;
         case "a":
             leftKey = false;
             break;
@@ -210,8 +202,8 @@ function KeyReleased(e){
 
 //teleportar a nave
 function teleport(){
-    nave.x = Math.floor(Math.random() * (canvas.width ));
-    nave.y = Math.floor(Math.random() * (canvas.height));
+    nave.x = Math.floor(Math.random() * W);
+    nave.y = Math.floor(Math.random() * H);
 }
 
 //tempo de espera para poder teleportar novamente
@@ -262,6 +254,34 @@ function angulo(){
     }else if(nave.angulo <= -360){
         nave.angulo = -360 - nave.angulo;
     }
+}
+
+//criar ovni
+function novOVNI(){
+    let direcao = Math.random() * 2 * Math.PI;
+
+    let xInit; //posição inicial em x
+    let yInit; //posiçai inicial em y
+
+    //diferenciar a posição inical do OVNI dependedo da direção
+    if(direcao < 1 || direcao > 5){
+        xInit = 0;
+        yInit = Math.random() * H;
+    }
+    else if(direcao < 2) {
+        xInit = Math.random() * W;
+        yInit = 0;
+    }
+    else if (direcao < 4){
+        xInit = W;
+        yInit = Math.random() * H;
+    }
+    else {
+        xInit = Math.random() * W;
+        yInit = Math.random() * H + H * 3/4;
+    }    
+
+    let ovni = new OVNI(xInit, yInit, direcao);
 }
 
 //render
@@ -332,6 +352,7 @@ function render(){
                 }
             }
         }
+
         if (leftKey) {
             //roda o angulo para a esquerda
             nave.angulo --
@@ -348,18 +369,18 @@ function render(){
         }
 
         //pintar a nave
-        ctx.fillStyle = 'blue' //ponto de colição (mudar/remover depois)
         ctx.save()
         ctx.translate(nave.x,nave.y)
-        ctx.beginPath();
         ctx.rotate(nave.angulo*Math.PI/180)
-        ctx.fillRect(nave.colisao.x, nave.colisao.y, nave.w + nave.colisao.w, nave.h + nave.colisao.h);  //ponto de colição (mudar/remover depois)
         ctx.drawImage(nave.imagem, -nave.w/2, -nave.h/2, nave.w, nave.h);
         ctx.restore()
 
         //disparar com o click do rato
         if (click){
-            tiros.push(new Tiro(nave.x+37, nave.y, 'White', 5, xR, yR))
+            let anguloTiro = Math.atan2(yR - nave.y, xR - nave.x);
+            let xi = 37* Math.cos(anguloTiro);
+            let yi = 37* Math.sin(anguloTiro);
+            tiros.push(new Tiro(xi, yi, 'White', 5, xR, yR, anguloTiro))
             click = false;
         }
 
@@ -399,6 +420,8 @@ function render(){
         tiro.update();
     })
 
+    
+
     window.requestAnimationFrame(render);
 }
 
@@ -416,18 +439,18 @@ canvas.addEventListener('mousedown', (e) => {
 for (let i = 0; i < 10; i++) {
     let xInit;
     let yInit;
-    let direction = Math.random() * 2 * Math.PI;
+    let direcao = Math.random() * 2 * Math.PI;
 
     //diferenciar a posição inical do asteroide dependedo da direção
-    if(direction < 1 || direction > 5){
+    if(direcao < 1 || direcao > 5){
         xInit = Math.random() * W/4;
         yInit = Math.random() * H;
     }
-    else if(direction < 2) {
+    else if(direcao < 2) {
         xInit = Math.random() * W;
         yInit = Math.random() * H/4;
     }
-    else if (direction < 4){
+    else if (direcao < 4){
         xInit = Math.random() * W + W * 3/4;
         yInit = Math.random() * H;
     }
@@ -435,7 +458,9 @@ for (let i = 0; i < 10; i++) {
         xInit = Math.random() * W;
         yInit = Math.random() * H + H * 3/4;
     }    
-    asteroides.push(new Asteroides(xInit, yInit, direction, imagens['Meteoro 2']));
+    asteroides.push(new Asteroides(xInit, yInit, direcao, imagens['Meteoro 2']));
 }
+
+novOVNI()
 
 window.onload = () => render()  //chamar a função render depois de carregar a pagina
