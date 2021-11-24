@@ -96,14 +96,13 @@ class Asteroides{
 
 //tiros
 class Tiro{
-    constructor(x, y, c, t, xR, yR, anguloTiro){
+    constructor(x, y, c, t, anguloTiro){
         this.x = x; //posisão do tiro em x
         this.y = y; //posisão do tiro em y
         this.c = c; //cor do tiro
         this.t = t; //tamanho do tiro
-        this.dX = 2 * Math.cos(xR); //direção do tiro em x
-        this.dY = 2* Math.sin(yR); //direção do tiro em y 
-        this.anguloTiro = anguloTiro       
+        this.dX = 3 * Math.cos(anguloTiro); //direção do tiro em x
+        this.dY = 3 * Math.sin(anguloTiro); //direção do tiro em y 
     }
 
     draw(){
@@ -114,25 +113,14 @@ class Tiro{
     }
 
     update(){
-        //atualizar a posição do tiro
-        // if(this.dX < this.x) this.x -= 5;
-        // if (this.dX > this.x) this.x += 5;
-        // if (this.dY < this.y) this.y -= 5;
-        // if (this.dY > this.y) this.y += 5;
-
         if (this.x < 0) this.x = W 
         if (this.x > W) this.x = 0
         if (this.y < 0)  this.y = H
         if (this.y > H) this.y = 0
 
         //disparar para o local em que o rato está localizado
-        this.x += 3* Math.cos(this.anguloTiro)
-        this.y += 3* Math.sin(this.anguloTiro)
-        
-        //retirar o tiro quando chegar ao destino
-        if (this.xR == this.x && this.yR == this.y) {
-            tiros.shift(); 
-        }
+        this.x += this.dX
+        this.y += this.dY
     }
 }
 
@@ -141,7 +129,8 @@ class OVNI{
     constructor(x, y, d){
         this.x = x; 
         this.y = y; 
-        this.d = d;
+        this.dX = 2 * Math.cos(d); //direção do ovni em x
+        this.dY = 2 * Math.sin(d); //direção do ovni em y
         this.img = imagens['Ovni'];
     }
 
@@ -281,7 +270,73 @@ function novOVNI(){
         yInit = Math.random() * H + H * 3/4;
     }    
 
-    let ovni = new OVNI(xInit, yInit, direcao);
+    ovni = new OVNI(xInit, yInit, direcao);
+}
+
+function Nave(){
+    // let direcaoNave = Math.atan2(nave.angulo - nave.x, nave.angulo + nave.y);
+    // console.log(direcaoNave);
+    // nave.x += 2 * Math.cos(direcaoNave);
+    // nave.y += 2 * Math.sin(direcaoNave);
+    
+    console.log(nave.angulo);
+    if(nave.angulo == 0){ //frente
+        nave.y -= 3;
+        if (nave.y < -nave.h){
+            nave.y = H;
+        }
+    }else if((nave.angulo<0 && nave.angulo>-90) || (nave.angulo< 360 && nave.angulo > 270)){ // diagonal superior esquerda
+        nave.y -= 3;
+        nave.x -= 3;
+        if (nave.y < -nave.h){
+            nave.y = H;
+        }
+        if (nave.x < -nave.w){
+            nave.x = W;
+        }
+    }else if((nave.angulo>0 && nave.angulo<90) || (nave.angulo> -360 && nave.angulo < -270)){ //diagonal superior direita
+         nave.y -= 3;
+         nave.x += 3;
+         if (nave.y < -nave.h){
+             nave.y = H;
+         }
+         if (nave.x > W){
+            nave.x = -nave.w;
+        }
+     }else if(nave.angulo == -90 || nave.angulo == 270){ //esquerda
+         nave.x -= 3;
+         if (nave.x < -nave.w){
+            nave.x = W;
+        }
+     }else if((nave.angulo < -90 && nave.angulo >- 180) || (nave.angulo < 270 && nave.angulo > 180)){ //diagonal inferior esquerda
+        nave.y += 3;
+        nave.x -= 3;
+        if (nave.x < -nave.w){
+            nave.x = W;
+        }
+        if (nave.y > H){
+            nave.y = -nave.h;
+        }
+    }else if(nave.angulo == 180 || nave.angulo == -180){ //baixo
+        nave.y += 3;
+        if (nave.y > H){
+            nave.y = -nave.h;
+        }
+    }else if((nave.angulo>90 && nave.angulo<180) || (nave.angulo> -270 && nave.angulo < -180)){ //diagonal inferior direita
+        nave.y += 3;
+        nave.x += 3;
+        if (nave.y > H){
+            nave.y = -nave.h;
+        }
+        if (nave.x > W){
+            nave.x = -nave.w;
+        }
+    }else if(nave.angulo == 90 || nave.angulo == -270){ //direita
+        nave.x += 3;
+        if (nave.x > W){
+            nave.x = -nave.w;
+        }
+    }
 }
 
 //render
@@ -291,66 +346,10 @@ function render(){
     //quando a nave tiver vidas
     if(nave.vida){
         angulo() //repor o angulo da nave para 0 quando passar de +/-360
-
+        
         //mover a nave
         if (upKey) {
-            if(nave.angulo == 0){ //frente
-                nave.y -= 3;
-                if (nave.y < -nave.h){
-                    nave.y = H;
-                }
-            }else if((nave.angulo<0 && nave.angulo>-90) || (nave.angulo< 360 && nave.angulo > 270)){ // diagonal superior esquerda
-                nave.y -= 3;
-                nave.x -= 3;
-                if (nave.y < -nave.h){
-                    nave.y = H;
-                }
-                if (nave.x < -nave.w){
-                    nave.x = W;
-                }
-            }else if((nave.angulo>0 && nave.angulo<90) || (nave.angulo> -360 && nave.angulo < -270)){ //diagonal superior direita
-                 nave.y -= 3;
-                 nave.x += 3;
-                 if (nave.y < -nave.h){
-                     nave.y = H;
-                 }
-                 if (nave.x > W){
-                    nave.x = -nave.w;
-                }
-             }else if(nave.angulo == -90 || nave.angulo == 270){ //esquerda
-                 nave.x -= 3;
-                 if (nave.x < -nave.w){
-                    nave.x = W;
-                }
-             }else if((nave.angulo < -90 && nave.angulo >- 180) || (nave.angulo < 270 && nave.angulo > 180)){ //diagonal inferior esquerda
-                nave.y += 3;
-                nave.x -= 3;
-                if (nave.x < -nave.w){
-                    nave.x = W;
-                }
-                if (nave.y > H){
-                    nave.y = -nave.h;
-                }
-            }else if(nave.angulo == 180 || nave.angulo == -180){ //baixo
-                nave.y += 3;
-                if (nave.y > H){
-                    nave.y = -nave.h;
-                }
-            }else if((nave.angulo>90 && nave.angulo<180) || (nave.angulo> -270 && nave.angulo < -180)){ //diagonal inferior direita
-                nave.y += 3;
-                nave.x += 3;
-                if (nave.y > H){
-                    nave.y = -nave.h;
-                }
-                if (nave.x > W){
-                    nave.x = -nave.w;
-                }
-            }else if(nave.angulo == 90 || nave.angulo == -270){ //direita
-                nave.x += 3;
-                if (nave.x > W){
-                    nave.x = -nave.w;
-                }
-            }
+            Nave()
         }
 
         if (leftKey) {
@@ -378,9 +377,14 @@ function render(){
         //disparar com o click do rato
         if (click){
             let anguloTiro = Math.atan2(yR - nave.y, xR - nave.x);
-            let xi = 37* Math.cos(anguloTiro);
-            let yi = 37* Math.sin(anguloTiro);
-            tiros.push(new Tiro(xi, yi, 'White', 5, xR, yR, anguloTiro))
+
+            // let xi = 37* Math.cos(nave.x);
+            // let yi = 37* Math.sin(nave.y);
+            //posição sem rotação da nave 
+            let xi = nave.x
+            let yi = -37 + nave.y
+
+            tiros.push(new Tiro(xi, yi, 'White', 5, anguloTiro))
             click = false;
         }
 
@@ -420,7 +424,8 @@ function render(){
         tiro.update();
     })
 
-    
+    // ovni.draw();
+    // ovni.update();
 
     window.requestAnimationFrame(render);
 }
@@ -436,7 +441,7 @@ canvas.addEventListener('mousedown', (e) => {
 })
 
 //criar asteroides 
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 0; i++) {
     let xInit;
     let yInit;
     let direcao = Math.random() * 2 * Math.PI;
@@ -461,6 +466,6 @@ for (let i = 0; i < 10; i++) {
     asteroides.push(new Asteroides(xInit, yInit, direcao, imagens['Meteoro 2']));
 }
 
-novOVNI()
+// novOVNI()
 
 window.onload = () => render()  //chamar a função render depois de carregar a pagina
