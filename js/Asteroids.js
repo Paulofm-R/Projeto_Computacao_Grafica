@@ -121,6 +121,12 @@ class Tiro{
         //disparar para o local em que o rato está localizado
         this.x += this.dX
         this.y += this.dY
+
+        //retirar tiros
+        if(this.x < 0) tiros.shift()
+        else if(this.x > W) tiros.shift()
+        else if(this.y < 0) tiros.shift()
+        else if(this.y > H) tiros.shift()
     }
 }
 
