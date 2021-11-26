@@ -1,3 +1,7 @@
+import Nave from "./Nave.js";
+import Tiros from "./Tiros.js";
+import Asteroides from "./Asteroides.js";
+
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
@@ -37,99 +41,16 @@ loadImage("Ovni")
 let asteroides = [];
 
 //array de tiros
-let tiros = [];
+let tirosNave = [];
+let tirosOVNI = [];
 
 //ovni
 let ovni;
 
-//array da nave
-let nave = {
-    x: W / 2,
-    y: H / 2,
-    w: 80,
-    h: 75,
-    imagem: imagens['Nave'], 
-    vida: true,
-    vidas: 5,
-    angulo: 0,
-    colisao: {  //correção para as coordenadas de colisao
-        x: -30,
-        y: -30,
-        w: -20,
-        h: -10
-    }
-};
-
+//inivializar nave
+let nave = new Nave(ctx, W, H, imagens['Nave']);
 
 //classes
-//asteroides
-class Asteroides{
-    constructor(x, y, d, img){
-        this.x = x; //posisão do asteroide em x
-        this.y = y; //posisão do asteroide em y
-        this.dX = 2 * Math.cos(d); //direção do asteroide em x
-        this.dY = 2 * Math.sin(d); //direção do asteroide em y
-        this.img = img; //imagem do asteroide
-        this.w = img.width; //largura
-        this.h = img.height; //altura
-    }
-
-    draw(){
-        //desenhar os asteroides
-        ctx.fillStyle = 'blue' //ponto de colição (mudar/remover depois)
-        ctx.beginPath();
-        ctx.fillRect(this.x + 5, this.y + 5, this.w - 10, this.h - 10); //ponto de colição (mudar/remover depois)
-        ctx.drawImage(this.img, this.x, this.y);         
-    }
-
-    update(){
-        // atualizar a posição dos asteroides
-        if (this.x < -120) this.x = W
-        if (this.x > W) this.x = -120
-        if (this.y < -68)  this.y = H
-        if (this.y > H) this.y = -68
-
-        this.x += this.dX;
-        this.y += this.dY;
-    }
-}
-
-//tiros
-class Tiro{
-    constructor(x, y, c, t, anguloTiro){
-        this.x = x; //posisão do tiro em x
-        this.y = y; //posisão do tiro em y
-        this.c = c; //cor do tiro
-        this.t = t; //tamanho do tiro
-        this.dX = 3 * Math.cos(anguloTiro); //direção do tiro em x
-        this.dY = 3 * Math.sin(anguloTiro); //direção do tiro em y 
-    }
-
-    draw(){
-        //desenhar o tiro
-        ctx.fillStyle = this.c;
-        ctx.beginPath();
-        ctx.fillRect(this.x, this.y, this.t, this.t);
-    }
-
-    update(){
-        if (this.x < 0) this.x = W 
-        if (this.x > W) this.x = 0
-        if (this.y < 0)  this.y = H
-        if (this.y > H) this.y = 0
-
-        //disparar para o local em que o rato está localizado
-        this.x += this.dX
-        this.y += this.dY
-
-        //retirar tiros
-        if(this.x < 0) tiros.shift()
-        else if(this.x > W) tiros.shift()
-        else if(this.y < 0) tiros.shift()
-        else if(this.y > H) tiros.shift()
-    }
-}
-
 //ovni
 class OVNI{
     constructor(x, y, d){
@@ -279,69 +200,31 @@ function novOVNI(){
     ovni = new OVNI(xInit, yInit, direcao);
 }
 
-function Nave(){
-    // let direcaoNave = Math.atan2(nave.angulo - nave.x, nave.angulo + nave.y);
-    // console.log(direcaoNave);
-    // nave.x += 2 * Math.cos(direcaoNave);
-    // nave.y += 2 * Math.sin(direcaoNave);
+//criar asteroides
+function criarAsteroides() {
+    for (let i = 0; i < 10; i++) {
+        let xInit;
+        let yInit;
+        let direcao = Math.random() * 2 * Math.PI;
     
-    console.log(nave.angulo);
-    if(nave.angulo == 0){ //frente
-        nave.y -= 3;
-        if (nave.y < -nave.h){
-            nave.y = H;
+        //diferenciar a posição inical do asteroide dependedo da direção
+        if(direcao < 1 || direcao > 5){
+            xInit = Math.random() * W/4;
+            yInit = Math.random() * H;
         }
-    }else if((nave.angulo<0 && nave.angulo>-90) || (nave.angulo< 360 && nave.angulo > 270)){ // diagonal superior esquerda
-        nave.y -= 3;
-        nave.x -= 3;
-        if (nave.y < -nave.h){
-            nave.y = H;
+        else if(direcao < 2) {
+            xInit = Math.random() * W;
+            yInit = Math.random() * H/4;
         }
-        if (nave.x < -nave.w){
-            nave.x = W;
+        else if (direcao < 4){
+            xInit = Math.random() * W + W * 3/4;
+            yInit = Math.random() * H;
         }
-    }else if((nave.angulo>0 && nave.angulo<90) || (nave.angulo> -360 && nave.angulo < -270)){ //diagonal superior direita
-         nave.y -= 3;
-         nave.x += 3;
-         if (nave.y < -nave.h){
-             nave.y = H;
-         }
-         if (nave.x > W){
-            nave.x = -nave.w;
-        }
-     }else if(nave.angulo == -90 || nave.angulo == 270){ //esquerda
-         nave.x -= 3;
-         if (nave.x < -nave.w){
-            nave.x = W;
-        }
-     }else if((nave.angulo < -90 && nave.angulo >- 180) || (nave.angulo < 270 && nave.angulo > 180)){ //diagonal inferior esquerda
-        nave.y += 3;
-        nave.x -= 3;
-        if (nave.x < -nave.w){
-            nave.x = W;
-        }
-        if (nave.y > H){
-            nave.y = -nave.h;
-        }
-    }else if(nave.angulo == 180 || nave.angulo == -180){ //baixo
-        nave.y += 3;
-        if (nave.y > H){
-            nave.y = -nave.h;
-        }
-    }else if((nave.angulo>90 && nave.angulo<180) || (nave.angulo> -270 && nave.angulo < -180)){ //diagonal inferior direita
-        nave.y += 3;
-        nave.x += 3;
-        if (nave.y > H){
-            nave.y = -nave.h;
-        }
-        if (nave.x > W){
-            nave.x = -nave.w;
-        }
-    }else if(nave.angulo == 90 || nave.angulo == -270){ //direita
-        nave.x += 3;
-        if (nave.x > W){
-            nave.x = -nave.w;
-        }
+        else {
+            xInit = Math.random() * W;
+            yInit = Math.random() * H + H * 3/4;
+        }    
+        asteroides.push(new Asteroides(ctx, xInit, yInit, direcao, imagens['Meteoro 2'], W, H));
     }
 }
 
@@ -355,9 +238,8 @@ function render(){
         
         //mover a nave
         if (upKey) {
-            Nave()
+            nave.mover()
         }
-
         if (leftKey) {
             //roda o angulo para a esquerda
             nave.angulo --
@@ -366,7 +248,6 @@ function render(){
             //roda o angulo da nave para a direita
             nave.angulo ++
         }
-
         //teleportar a nave
         if (space){
             teleport()
@@ -374,33 +255,28 @@ function render(){
         }
 
         //pintar a nave
-        ctx.save()
-        ctx.translate(nave.x,nave.y)
-        ctx.rotate(nave.angulo*Math.PI/180)
-        ctx.drawImage(nave.imagem, -nave.w/2, -nave.h/2, nave.w, nave.h);
-        ctx.restore()
+        nave.desenhar();
 
         //disparar com o click do rato
         if (click){
             let anguloTiro = Math.atan2(yR - nave.y, xR - nave.x);
-
             // let xi = 37* Math.cos(nave.x);
             // let yi = 37* Math.sin(nave.y);
             //posição sem rotação da nave 
             let xi = nave.x
             let yi = -37 + nave.y
 
-            tiros.push(new Tiro(xi, yi, 'White', 5, anguloTiro))
+            tirosNave.push(new Tiros(ctx, xi, yi, anguloTiro))
             click = false;
         }
 
         //tiro -> asteroides (colisão)
-        for (let t = 0; t < tiros.length; t++){
+        for (let t = 0; t < tirosNave.length; t++){
             for(let a = 0; a < asteroides.length; a++){
-                let colicao = colisoes(asteroides[a], tiros[t]);
+                let colicao = colisoes(asteroides[a], tirosNave[t]);
                 
                 if(colicao){ //quando o tiro entrar na area de colisão do asteroide, eliminar os dois do array
-                    tiros.splice(t, 1);
+                    tirosNave.splice(t, 1);
                     asteroides.splice(a, 1);
                     break
                 }
@@ -418,6 +294,10 @@ function render(){
         }
     }
 
+    // if(asteroides.length == 0){
+    //     criarAsteroides()
+    // }
+
     //desenhar e mover os asteroides
     asteroides.forEach( asteroide => {
         asteroide.draw();
@@ -425,13 +305,31 @@ function render(){
     });
 
     //desenhar e mover os tiros
-    tiros.forEach(tiro =>{
+    tirosNave.forEach(tiro =>{
         tiro.draw();
         tiro.update();
+
+        //retirar tiros
+        if(tiro.x < 0) tirosNave.shift()
+        else if(tiro.x > W) tirosNave.shift()
+        else if(tiro.y < 0) tirosNave.shift()
+        else if(tiro.y > H) tirosNave.shift()
     })
 
-    // ovni.draw();
-    // ovni.update();
+    //desenhar e mover os tiros
+    tirosOVNI.forEach(tiro =>{
+        tiro.draw();
+        tiro.update();
+
+        //retirar tiros
+        if(tiro.x < 0) tiros.shift()
+        else if(tiro.x > W) tiros.shift()
+        else if(tiro.y < 0) tiros.shift()
+        else if(tiro.y > H) tiros.shift()
+    })
+
+    ovni.draw();
+    ovni.update();
 
     window.requestAnimationFrame(render);
 }
@@ -446,32 +344,6 @@ canvas.addEventListener('mousedown', (e) => {
     yR = e.clientY;
 })
 
-//criar asteroides 
-for (let i = 0; i < 0; i++) {
-    let xInit;
-    let yInit;
-    let direcao = Math.random() * 2 * Math.PI;
-
-    //diferenciar a posição inical do asteroide dependedo da direção
-    if(direcao < 1 || direcao > 5){
-        xInit = Math.random() * W/4;
-        yInit = Math.random() * H;
-    }
-    else if(direcao < 2) {
-        xInit = Math.random() * W;
-        yInit = Math.random() * H/4;
-    }
-    else if (direcao < 4){
-        xInit = Math.random() * W + W * 3/4;
-        yInit = Math.random() * H;
-    }
-    else {
-        xInit = Math.random() * W;
-        yInit = Math.random() * H + H * 3/4;
-    }    
-    asteroides.push(new Asteroides(xInit, yInit, direcao, imagens['Meteoro 2']));
-}
-
-// novOVNI()
+novOVNI()
 
 window.onload = () => render()  //chamar a função render depois de carregar a pagina
