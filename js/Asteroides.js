@@ -10,7 +10,7 @@ export default class Asteroides{
         this.h = img.height; //altura
         this.ctx = ctx;
         this.W = W;
-        this.H = H
+        this.H = H;
     }
 
     draw(){

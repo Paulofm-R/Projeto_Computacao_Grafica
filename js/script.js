@@ -1,22 +1,20 @@
 import Nave from "./Nave.js";
 import Tiros from "./Tiros.js";
 import Asteroides from "./Asteroides.js";
+import OVNI from "./OVNI.js";
 
 const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
 //colocar em tela cheia
-canvas.width  = window.innerWidth - 10;
-canvas.height = window.innerHeight - 10;
+canvas.width  = window.innerWidth - 5;
+canvas.height = window.innerHeight - 5;
 
 const W = canvas.width;
 const H = canvas.height;
 
 //setas
 let upKey = false;
-let downKey = false;
-let leftKey = false;
-let rightKey = false;
 
 //teleporte
 let space = false;
@@ -35,10 +33,11 @@ loadImage("Meteoro 1");
 loadImage("Meteoro 2");
 loadImage("Meteoro 3");
 loadImage("Meteoro 4");
-loadImage("Ovni")
+loadImage("Ovni");
 
 //array de asteroides
 let asteroides = [];
+let numAsteroides = 10 //numero de asteroides
 
 //array de tiros
 let tirosNave = [];
@@ -49,29 +48,6 @@ let ovni;
 
 //inivializar nave
 let nave = new Nave(ctx, W, H, imagens['Nave']);
-
-//classes
-//ovni
-class OVNI{
-    constructor(x, y, d){
-        this.x = x; 
-        this.y = y; 
-        this.dX = 2 * Math.cos(d); //direção do ovni em x
-        this.dY = 2 * Math.sin(d); //direção do ovni em y
-        this.img = imagens['Ovni'];
-    }
-
-    draw(){
-        //desenhar o OVNI
-        ctx.drawImage(this.img, this.x, this.y);  
-    }
-
-    update(){
-        // atualizar a posição dos ovni
-        this.x += this.dX;
-        this.y += this.dY;
-    }
-}
 
 //function
 //carregar imagens
@@ -86,10 +62,12 @@ function KeyPressed(e){
         upKey = true;
     }
     if (e.key == 'a'){
-        leftKey = true;
+        //roda o angulo para a esquerda
+        nave.rotacao = -5 / 180 * Math.PI
     }
-    if (e.key == 'd'){
-        rightKey = true;
+    else if (e.key == 'd'){
+        //roda o angulo da nave para a direita
+        nave.rotacao = 5 / 180 * Math.PI
     }
     if (e.key == ' ' && spaceTimer == 0){
         space = true;
@@ -105,10 +83,10 @@ function KeyReleased(e){
             upKey = false; ;
             break;
         case "a":
-            leftKey = false;
+            nave.rotacao = 0;
             break;
         case "d":
-            rightKey = false;
+            nave.rotacao = 0;
             break;
         case ' ':
             space = false;
@@ -197,12 +175,12 @@ function novOVNI(){
         yInit = Math.random() * H + H * 3/4;
     }    
 
-    ovni = new OVNI(xInit, yInit, direcao);
+    ovni = new OVNI(ctx, xInit, yInit, direcao, imagens['Ovni']);
 }
 
 //criar asteroides
 function criarAsteroides() {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < numAsteroides; i++) {
         let xInit;
         let yInit;
         let direcao = Math.random() * 2 * Math.PI;
@@ -224,8 +202,11 @@ function criarAsteroides() {
             xInit = Math.random() * W;
             yInit = Math.random() * H + H * 3/4;
         }    
+
         asteroides.push(new Asteroides(ctx, xInit, yInit, direcao, imagens['Meteoro 2'], W, H));
     }
+    console.log(numAsteroides);
+    numAsteroides += 2;
 }
 
 //render
@@ -234,20 +215,13 @@ function render(){
 
     //quando a nave tiver vidas
     if(nave.vida){
-        angulo() //repor o angulo da nave para 0 quando passar de +/-360
+        // angulo() //repor o angulo da nave para 0 quando passar de +/-360
         
         //mover a nave
         if (upKey) {
             nave.mover()
         }
-        if (leftKey) {
-            //roda o angulo para a esquerda
-            nave.angulo --
-        }
-        if (rightKey) {
-            //roda o angulo da nave para a direita
-            nave.angulo ++
-        }
+
         //teleportar a nave
         if (space){
             teleport()
@@ -260,11 +234,10 @@ function render(){
         //disparar com o click do rato
         if (click){
             let anguloTiro = Math.atan2(yR - nave.y, xR - nave.x);
-            // let xi = 37* Math.cos(nave.x);
-            // let yi = 37* Math.sin(nave.y);
-            //posição sem rotação da nave 
-            let xi = nave.x
-            let yi = -37 + nave.y
+
+            //posição sem rotação da nave
+            let xi = nave.x + nave.w/2 * Math.cos(nave.angulo - (90 / 180 * Math.PI));
+            let yi = nave.y + nave.h/2 * Math.sin(nave.angulo - (90 / 180 * Math.PI));
 
             tirosNave.push(new Tiros(ctx, xi, yi, anguloTiro))
             click = false;
@@ -294,9 +267,9 @@ function render(){
         }
     }
 
-    // if(asteroides.length == 0){
-    //     criarAsteroides()
-    // }
+    if(asteroides.length == 0){
+        criarAsteroides()
+    }
 
     //desenhar e mover os asteroides
     asteroides.forEach( asteroide => {
