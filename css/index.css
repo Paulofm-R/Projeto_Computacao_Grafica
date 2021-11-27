@@ -1,5 +1,9 @@
 body{
+    background-image: url('../img/fundo_inicial.png');
+    background-size: 98%;
+    background-repeat: no-repeat;
     background-color: black;
+    
 }
 
 h1,
@@ -26,4 +30,23 @@ a{
 a:hover{
     background-color: rgba(37, 37, 37, 0.295);
     color:rgb(199, 199, 199);
+}
+
+#nave{
+    padding-top: 40px;
+    padding-left: 158px;
+    transform: rotate(46deg);
+}
+
+#meteoro1{
+    animation: rotation 8s infinite linear;
+}
+
+@keyframes meteoro1 {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(359deg);
+    }
 }
