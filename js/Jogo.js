@@ -111,42 +111,33 @@ function teleportTimer(){
 
 /**
  * colisões
- * @param {object} obj1 asteroides 
- * @param {object} obj2 tiros ou nave
+ * @param {object} obj1 objeto de colição um 
+ * @param {object} obj2 objeto de colição dois
  * @param {object} nave se a nave
  * @returns 
  */
 function colisoes(obj1, obj2, nave = false){
     if (nave){
-        if ((Math.floor(obj1.x)) + (obj1.w) < (obj2.x + obj2.colisao.x) || 
-        (Math.floor(obj1.x)) > (obj2.x + obj2.colisao.x) + (obj2.w + obj2.colisao.w) ||
-        (Math.floor(obj1.y)) + obj1.h < (obj2.y + obj2.colisao.y) ||
-        (Math.floor(obj1.y)) > (obj2.y + obj2.colisao.y) + (obj2.h + obj2.colisao.h)) {
+        if ((Math.floor(obj1.x + obj1.colisao.x)) + (obj1.w + obj1.colisao.w) < (obj2.x + obj2.colisao.x) || 
+        (Math.floor(obj1.x + obj1.colisao.x)) > (obj2.x + obj2.colisao.x) + (obj2.w + obj2.colisao.w) ||
+        (Math.floor(obj1.y + obj1.colisao.y)) + (obj1.h + obj1.colisao.h) < (obj2.y + obj2.colisao.y) ||
+        (Math.floor(obj1.y + obj1.colisao.y)) > (obj2.y + obj2.colisao.y) + (obj2.h + obj2.colisao.h)) {
         return false;
     } 
-    else { 
+    else {
         return true;
         }
     }
     else{
-        if ((Math.floor(obj1.x)) + (obj1.w) < obj2.x || 
-        (Math.floor(obj1.x)) > obj2.x + obj2.w ||
-        (Math.floor(obj1.y)) + (obj1.h) < obj2.y ||
-        (Math.floor(obj1.y)) > obj2.y + obj2.h) {
+        if ((Math.floor(obj1.x + obj1.colisao.x)) + (obj1.w + obj1.colisao.w) < obj2.x || 
+        (Math.floor(obj1.x + obj1.colisao.x)) > obj2.x + obj2.w ||
+        (Math.floor(obj1.y + obj1.colisao.y)) + (obj1.h + obj1.colisao.h) < obj2.y ||
+        (Math.floor(obj1.y + obj1.colisao.y)) > obj2.y + obj2.h) {
         return false;
     } 
     else { 
         return true;
         }
-    }
-}
-
-//função para ajustar o angulo
-function angulo(){
-    if(nave.angulo >= 360){
-        nave.angulo = nave.angulo - 360;
-    }else if(nave.angulo <= -360){
-        nave.angulo = -360 - nave.angulo;
     }
 }
 
@@ -203,10 +194,25 @@ function criarAsteroides() {
             yInit = Math.random() * H + H * 3/4;
         }    
 
-        asteroides.push(new Asteroides(ctx, xInit, yInit, direcao, imagens['Meteoro 2'], W, H));
+        asteroides.push(new Asteroides(ctx, xInit, yInit, direcao, imagens['Meteoro 2'], 2, W, H));
     }
-    console.log(numAsteroides);
+
     numAsteroides += 2;
+}
+
+function destroirAsteroides(asteroide){
+    console.log(asteroide);
+    if(asteroide.estagio < 4){
+        asteroide.estagio++
+
+        for (let i = 0; i < 2; i++){
+            let direcao = Math.random() * 2 * Math.PI;
+            
+            asteroides.push(new Asteroides(ctx, asteroide.x, asteroide.y, direcao, imagens[`Meteoro ${asteroide.estagio}`], asteroide.estagio, W, H));
+        }
+    }
+
+    asteroides.splice(asteroide, 1);
 }
 
 //render
@@ -214,9 +220,7 @@ function render(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     //quando a nave tiver vidas
-    if(nave.vida){
-        // angulo() //repor o angulo da nave para 0 quando passar de +/-360
-        
+    if(nave.vida){        
         //mover a nave
         if (upKey) {
             nave.mover()
@@ -250,7 +254,7 @@ function render(){
                 
                 if(colicao){ //quando o tiro entrar na area de colisão do asteroide, eliminar os dois do array
                     tirosNave.splice(t, 1);
-                    asteroides.splice(a, 1);
+                    destroirAsteroides(asteroides[a])
                     break
                 }
             }
@@ -261,8 +265,14 @@ function render(){
             let colicao = colisoes(asteroides[a], nave, true);
 
             if(colicao){ //quando a nave bate contra o asteroide
-                asteroides.splice(a, 1);
-                nave.vida = false;
+                destroirAsteroides(asteroides[a])
+                nave.vidas--;
+                nave.x = W / 2;
+                nave.y = H / 2;
+
+                if(nave.vidas == 0){
+                    nave.vida = false;
+                }
             }
         }
     }
@@ -301,8 +311,14 @@ function render(){
         else if(tiro.y > H) tiros.shift()
     })
 
-    ovni.draw();
-    ovni.update();
+    // ovni.draw();
+    // ovni.update();
+
+    //quantidade de vidas na tela
+    ctx.fillStyle = 'White';
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 20px sans-serif';
+    ctx.fillText(`VIDAS: ${nave.vidas}`, 75, 40); 
 
     window.requestAnimationFrame(render);
 }

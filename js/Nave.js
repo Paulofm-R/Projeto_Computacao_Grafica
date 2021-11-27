@@ -7,16 +7,22 @@ export default class Nave{
         this.h = 75;
         this.imagem = imagem;
         this.vida = true;
-        this.vidas = 5;
+        this.vidas = 3;
         this.angulo = 0;
         this.rotacao = 0;
-        this.colisao = {x: -30, y: -30, w: -20, h: -10}; //correção para as coordenadas de colisao
+        this.colisao = { //correção para as coordenadas de colisao
+            x: -30, 
+            y: -30, 
+            w: -20, 
+            h: -10
+        }; 
         this.tiros = [];
         this.acelerar = false;
         this.aceleracao = {
             x: 0,
             y: 0
         }
+        this.pontos = 0;
         this.ctx = ctx;
         this.W = W;
         this.H = H;
