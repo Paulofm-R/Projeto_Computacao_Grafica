@@ -38,14 +38,10 @@ loadImage("Ovni");
 
 //array de asteroides
 let asteroides = [];
-let numAsteroides = 10 //numero de asteroides
-
-//array de tiros
-let tirosNave = [];
-let tirosOVNI = [];
+let numAsteroides = 5 //numero de asteroides
 
 //ovni
-let ovni;
+let ovni = new OVNI(ctx, imagens['Ovni'], W, H);;
 
 //inivializar nave
 let nave = new Nave(ctx, W, H, imagens['Nave']);
@@ -81,7 +77,7 @@ function KeyPressed(e){
 function KeyReleased(e){
     switch (e.key){
         case "w":
-            upKey = false; 
+            upKey = false;
             break;
         case "a":
             nave.rotacao = 0;
@@ -94,8 +90,6 @@ function KeyReleased(e){
             break;
     }
 }
-
-
 
 //teleportar a nave
 function teleport(){
@@ -146,30 +140,15 @@ function colisoes(obj1, obj2, nave = false){
 
 //criar ovni
 function novOVNI(){
-    let direcao = Math.random() * 2 * Math.PI;
-
-    let xInit; //posição inicial em x
-    let yInit; //posiçai inicial em y
-
-    //diferenciar a posição inical do OVNI dependedo da direção
-    if(direcao < 1 || direcao > 5){
-        xInit = 0;
-        yInit = Math.random() * H;
+    if(!ovni.emJogo){
+        ovni.criarOVNI()
     }
-    else if(direcao < 2) {
-        xInit = Math.random() * W;
-        yInit = 0;
-    }
-    else if (direcao < 4){
-        xInit = W;
-        yInit = Math.random() * H;
-    }
-    else {
-        xInit = Math.random() * W;
-        yInit = Math.random() * H + H * 3/4;
-    }    
+}
 
-    ovni = new OVNI(ctx, xInit, yInit, direcao, imagens['Ovni']);
+function tirOVNI(){
+    if(ovni.emJogo){
+        ovni.disparar(nave.x - nave.w/2, nave.y - nave.h/2)
+    }
 }
 
 //criar asteroides
@@ -229,7 +208,7 @@ function render(){
             nave.mover()
             primeiroClique = true;
         }
-
+        
         //aceleração final
         if(upKey == false && primeiroClique == true){
             nave.aceleracao()
@@ -246,26 +225,59 @@ function render(){
 
         //disparar com o click do rato
         if (click){
-            let anguloTiro = Math.atan2(yR - nave.y, xR - nave.x);
-
-            //posição sem rotação da nave
-            let xi = nave.x + nave.w/2 * Math.cos(nave.angulo - (90 / 180 * Math.PI));
-            let yi = nave.y + nave.h/2 * Math.sin(nave.angulo - (90 / 180 * Math.PI));
-
-            tirosNave.push(new Tiros(ctx, xi, yi, anguloTiro))
+            nave.disparar(xR, yR);
             click = false;
         }
 
-        //tiro -> asteroides (colisão)
-        for (let t = 0; t < tirosNave.length; t++){
+        //tiro (NAVE) -> asteroides (colisão)
+        for (let t = 0; t < nave.tiros.length; t++){
             for(let a = 0; a < asteroides.length; a++){
-                let colicao = colisoes(asteroides[a], tirosNave[t]);
+                let colicao = colisoes(asteroides[a], nave.tiros[t]);
                 
                 if(colicao){ //quando o tiro entrar na area de colisão do asteroide, eliminar os dois do array
-                    tirosNave.splice(t, 1);
+                    nave.tiros.splice(t, 1);
+                    
+                    //atribuir pontos
+                    nave.atribuirPontos(asteroides[a].estagio)
+                    
                     destroirAsteroides(asteroides[a])
                     break
                 }
+            }
+        }
+
+        //tiro (NAVE) -> OVNI
+        for (let t = 0; t < nave.tiros.length; t++){
+            if(ovni.emJogo){
+                let colicao = colisoes(ovni, nave.tiros[t]);
+            
+                if(colicao){ //quando o tiro entrar na area de colisão do OVNI
+                    nave.tiros.splice(t, 1);
+                    
+                    //atribuir pontos
+                    nave.atribuirPontos('OVNI')
+                    
+                    ovni.emJogo = false;
+                    break;
+                }
+            } 
+        }
+
+        //tiro (OVNI) -> Nave
+        for (let t = 0; t < ovni.tiros.length; t++){
+            let colicao = colisoes(nave, ovni.tiros[t]);
+            
+            if(colicao){ //quando o tiro entrar na area de colisão do OVNI
+                ovni.tiros.splice(t, 1);
+                
+                nave.vidas--;
+                nave.x = W / 2;
+                nave.y = H / 2;
+
+                if(nave.vidas == 0){
+                    nave.vida = false;
+                }
+                break;
             }
         }
 
@@ -282,13 +294,50 @@ function render(){
                 if(nave.vidas == 0){
                     nave.vida = false;
                 }
+                break;
+            }
+        }
+
+        //nave -> ovni (colisão)
+        if(ovni.emJogo){
+            let colicao = colisoes(ovni, nave, true);
+
+            if(colicao){ //quando a nave bate contra o OVNI
+                ovni.emJogo = false;
+                nave.vidas--;
+                nave.x = W / 2;
+                nave.y = H / 2;
+
+                if(nave.vidas == 0){
+                    nave.vida = false;
+                }
+            }
+        }
+
+        //OVNI -> asteroides (colisão)
+        for (let a = 0; a < asteroides.length; a++){
+            if(ovni.emJogo){
+                let colicao = colisoes(asteroides[a], ovni, true);
+
+                if(colicao){ //quando a nave bate contra o asteroide
+                    destroirAsteroides(asteroides[a])
+                    
+                    ovni.emJogo = false;
+                    break;
+                }
             }
         }
     }
-
-    if(asteroides.length == 0){
-        criarAsteroides()
+    else{
+        ctx.fillStyle = 'White';
+        ctx.textAlign = 'center';
+        ctx.font = 'bold 50px sans-serif';
+        ctx.fillText(`GAME OVER`, W/2, H/2);
     }
+
+    // if(asteroides.length == 0 || !ovni.emJogo){
+    //     criarAsteroides()
+    // }
 
     //desenhar e mover os asteroides
     asteroides.forEach( asteroide => {
@@ -297,37 +346,47 @@ function render(){
     });
 
     //desenhar e mover os tiros
-    tirosNave.forEach(tiro =>{
+    nave.tiros.forEach(tiro =>{
         tiro.draw();
         tiro.update();
 
         //retirar tiros
-        if(tiro.x < 0) tirosNave.shift()
-        else if(tiro.x > W) tirosNave.shift()
-        else if(tiro.y < 0) tirosNave.shift()
-        else if(tiro.y > H) tirosNave.shift()
+        if(tiro.x < 0) nave.tiros.shift()
+        else if(tiro.x > W) nave.tiros.shift()
+        else if(tiro.y < 0) nave.tiros.shift()
+        else if(tiro.y > H) nave.tiros.shift()
     })
 
-    //desenhar e mover os tiros
-    tirosOVNI.forEach(tiro =>{
+    if(ovni.emJogo){
+        ovni.draw();
+        ovni.update();
+        
+        if(ovni.x < -ovni.w || ovni.x > W + ovni.w || ovni.y < -ovni.h || ovni.y > H + ovni.h) {
+            ovni.emJogo = false
+        }
+    }
+
+    //desenhar e mover os tiros do OVNI
+    ovni.tiros.forEach(tiro =>{
         tiro.draw();
         tiro.update();
 
         //retirar tiros
-        if(tiro.x < 0) tiros.shift()
-        else if(tiro.x > W) tiros.shift()
-        else if(tiro.y < 0) tiros.shift()
-        else if(tiro.y > H) tiros.shift()
+        if(tiro.x < 0) ovni.tiros.shift()
+        else if(tiro.x > W) ovni.tiros.shift()
+        else if(tiro.y < 0) ovni.tiros.shift()
+        else if(tiro.y > H) ovni.tiros.shift()
     })
-
-    // ovni.draw();
-    // ovni.update();
+    
 
     //quantidade de vidas na tela
     ctx.fillStyle = 'White';
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'left';
     ctx.font = 'bold 20px sans-serif';
-    ctx.fillText(`VIDAS: ${nave.vidas}`, 75, 40); 
+    ctx.fillText(`VIDAS: ${nave.vidas}`, 35, 40);
+    
+    //pontuação atual do jogador
+    ctx.fillText(`Pontuação: ${nave.pontos}`, 35, 70);
 
     window.requestAnimationFrame(render);
 }
@@ -342,6 +401,7 @@ canvas.addEventListener('mousedown', (e) => {
     yR = e.clientY;
 })
 
-novOVNI()
+setInterval(novOVNI, 5000);
+setInterval(tirOVNI, 1000);
 
 window.onload = () => render()  //chamar a função render depois de carregar a pagina
