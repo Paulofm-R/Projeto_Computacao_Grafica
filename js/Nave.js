@@ -18,10 +18,12 @@ export default class Nave{
         }; 
         this.tiros = [];
         this.acelerar = false;
-        this.aceleracao = {
-            x: 0,
-            y: 0
-        }
+        // this.aceleracao = {
+        //     x: 0,
+        //     y: 0
+        // }
+        this.aX = 0;
+        this.aY = 0;
         this.pontos = 0;
         this.ctx = ctx;
         this.W = W;
@@ -39,8 +41,11 @@ export default class Nave{
     }
 
     mover(){
-        this.x += 5 * Math.cos(this.angulo - (90 / 180 * Math.PI));
-        this.y += 5 * Math.sin(this.angulo - (90 / 180 * Math.PI));
+        this.aX += 0.05*(5 * Math.cos(this.angulo - (90 / 180 * Math.PI)));
+        this.aY += 0.05*(5 * Math.sin(this.angulo - (90 / 180 * Math.PI)));
+
+        this.x += this.aX
+        this.y += this.aY
 
         if (this.y < -this.h){
             this.y = this.H;
@@ -54,5 +59,37 @@ export default class Nave{
         if (this.x < -this.w){
             this.x = this.W;
         }
+    }
+
+    aceleracao(){
+            this.aX = 0
+            this.aY = 0
+            
+            for(let i = 5 ; i >= 0; i--){
+                this.aX += (i/100)*(5 * Math.cos(this.angulo - (90 / 180 * Math.PI)));
+                this.aY += (i/100)*(5 * Math.sin(this.angulo - (90 / 180 * Math.PI)));
+
+                this.x += this.aX
+                this.y += this.aY
+
+                if (this.y < -this.h){
+                    this.y = this.H;
+                }
+                if (this.y > this.H + this.h/2){
+                    this.y = -this.h/2;
+                }
+                if (this.x > this.W + this.w/2){
+                    this.x = -this.w/2;
+                }
+                if (this.x < -this.w){
+                    this.x = this.W;
+                }
+
+                if(i == 0){
+                    this.aX = 0
+                    this.aY = 0
+                }
+                console.log(i)
+            }
     }
 }

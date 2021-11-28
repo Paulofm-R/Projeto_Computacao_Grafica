@@ -15,6 +15,7 @@ const H = canvas.height;
 
 //setas
 let upKey = false;
+let primeiroClique = false
 
 //teleporte
 let space = false;
@@ -80,7 +81,7 @@ function KeyPressed(e){
 function KeyReleased(e){
     switch (e.key){
         case "w":
-            upKey = false; ;
+            upKey = false; 
             break;
         case "a":
             nave.rotacao = 0;
@@ -93,6 +94,8 @@ function KeyReleased(e){
             break;
     }
 }
+
+
 
 //teleportar a nave
 function teleport(){
@@ -224,6 +227,12 @@ function render(){
         //mover a nave
         if (upKey) {
             nave.mover()
+            primeiroClique = true;
+        }
+
+        //aceleração final
+        if(upKey == false && primeiroClique == true){
+            nave.aceleracao()
         }
 
         //teleportar a nave
