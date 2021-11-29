@@ -23,7 +23,9 @@ let spaceTimer = 0;
 let timer
 
 //rato
-let click = false;  
+let click = false;
+let especial = false;
+let especialTimer = 30;  
 let xR;
 let yR;
 
@@ -99,7 +101,6 @@ function teleport(){
 
 //tempo de espera para poder teleportar novamente
 function teleportTimer(){
-    console.log(spaceTimer);
     spaceTimer--;
     if (spaceTimer == 0){
         clearInterval(timer);
@@ -182,9 +183,8 @@ function criarAsteroides() {
     numAsteroides += 2;
 }
 
-function destroirAsteroides(asteroide){
-    console.log(asteroide);
-    if(asteroide.estagio < 4){
+function destroirAsteroides(asteroide, especial = false) {
+    if(asteroide.estagio < 4 && !especial){
         asteroide.estagio++
 
         for (let i = 0; i < 2; i++){
@@ -195,6 +195,15 @@ function destroirAsteroides(asteroide){
     }
 
     asteroides.splice(asteroide, 1);
+}
+
+function carregarEspecial(){
+    if(especialTimer == 0) {
+        especial = true;
+    }
+    else if(especialTimer > 0){
+        especialTimer--
+    }
 }
 
 //render
@@ -225,8 +234,17 @@ function render(){
 
         //disparar com o click do rato
         if (click){
-            nave.disparar(xR, yR);
+            nave.disparar(xR, yR, especial);          
             click = false;
+
+            if(especial){
+                especial = false;
+                especialTimer = 30;
+            }
+        }
+
+        if(especialTimer == 30){
+            
         }
 
         //tiro (NAVE) -> asteroides (colisão)
@@ -235,12 +253,10 @@ function render(){
                 let colicao = colisoes(asteroides[a], nave.tiros[t]);
                 
                 if(colicao){ //quando o tiro entrar na area de colisão do asteroide, eliminar os dois do array
-                    nave.tiros.splice(t, 1);
-                    
                     //atribuir pontos
-                    nave.atribuirPontos(asteroides[a].estagio)
-                    
-                    destroirAsteroides(asteroides[a])
+                    nave.atribuirPontos(asteroides[a].estagio, nave.tiros[t].especial)
+                    destroirAsteroides(asteroides[a], nave.tiros[t].especial)
+                    nave.tiros.splice(t, 1);
                     break
                 }
             }
@@ -248,14 +264,14 @@ function render(){
 
         //tiro (NAVE) -> OVNI
         for (let t = 0; t < nave.tiros.length; t++){
+            console.log(nave.tiros[t].especial);
             if(ovni.emJogo){
                 let colicao = colisoes(ovni, nave.tiros[t]);
             
                 if(colicao){ //quando o tiro entrar na area de colisão do OVNI
-                    nave.tiros.splice(t, 1);
-                    
                     //atribuir pontos
-                    nave.atribuirPontos('OVNI')
+                    nave.atribuirPontos('OVNI', nave.tiros[t].especial)
+                    nave.tiros.splice(t, 1);
                     
                     ovni.emJogo = false;
                     break;
@@ -335,7 +351,7 @@ function render(){
         ctx.fillText(`GAME OVER`, W/2, H/2);
     }
 
-    // if(asteroides.length == 0 || !ovni.emJogo){
+    // if(asteroides.length == 0 && !ovni.emJogo){
     //     criarAsteroides()
     // }
 
@@ -388,6 +404,22 @@ function render(){
     //pontuação atual do jogador
     ctx.fillText(`Pontuação: ${nave.pontos}`, 35, 70);
 
+    //circulo com o tempo até o teleporte
+    ctx.beginPath();
+    ctx.strokeStyle = 'White';
+    ctx.arc(W - 175, H - 60, 50, 0, 2 * Math.PI);
+    ctx.stroke();
+    ctx.textAlign = 'center';
+    ctx.fillText(spaceTimer, W - 175, H - 50);
+
+    //circulo com o tempo até a habilidade
+    ctx.beginPath();
+    ctx.strokeStyle = 'White';
+    ctx.arc(W - 75, H - 125, 50, 0, 2 * Math.PI);
+    ctx.stroke();
+    ctx.fillText(especialTimer, W - 75, H - 115);
+
+
     window.requestAnimationFrame(render);
 }
 
@@ -401,7 +433,9 @@ canvas.addEventListener('mousedown', (e) => {
     yR = e.clientY;
 })
 
-setInterval(novOVNI, 5000);
-setInterval(tirOVNI, 1000);
+setInterval(novOVNI, 30000);
+// setInterval(tirOVNI, 1000);
+setInterval(carregarEspecial, 1000)
+
 
 window.onload = () => render()  //chamar a função render depois de carregar a pagina

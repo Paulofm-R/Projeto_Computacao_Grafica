@@ -66,6 +66,6 @@ export default class OVNI{
     disparar(x, y){
         let anguloTiro = Math.atan2(y - this.y, x - this.x);
 
-        this.tiros.push(new Tiros(this.ctx, this.x + this.w/2, this.y + this.h/2, anguloTiro))
+        this.tiros.push(new Tiros(this.ctx, this.x + this.w/2, this.y + this.h/2, anguloTiro, 5))
     }
 }

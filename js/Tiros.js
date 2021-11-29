@@ -1,10 +1,11 @@
 //definição dos tiros
 export default class Tiros{
-    constructor(ctx, x, y, anguloTiro){
+    constructor(ctx, x, y, anguloTiro, t, especial = false){
         this.x = x; //posisão do tiro em x
         this.y = y; //posisão do tiro em y
         this.c = 'White'; //cor do tiro
-        this.t = 5; //tamanho do tiro
+        this.t = t; //tamanho do tiro
+        this.especial = especial; //
         this.dX = 3 * Math.cos(anguloTiro); //direção do tiro em x
         this.dY = 3 * Math.sin(anguloTiro); //direção do tiro em y 
         this.ctx = ctx;

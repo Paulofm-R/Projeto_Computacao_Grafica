@@ -64,37 +64,48 @@ export default class Nave{
         }
     }
 
-    disparar(xR, yR){
+    disparar(xR, yR, especial){
         let anguloTiro = Math.atan2(yR - this.y, xR - this.x);
 
         //posição sem rotação da nave
         let xi = this.x + this.w/2 * Math.cos(this.angulo - (90 / 180 * Math.PI));
         let yi = this.y + this.h/2 * Math.sin(this.angulo - (90 / 180 * Math.PI));
 
-        this.tiros.push(new Tiros(this.ctx, xi, yi, anguloTiro))
+        if(!especial){
+            this.tiros.push(new Tiros(this.ctx, xi, yi, anguloTiro, 5));
+        }
+        else{
+            this.tiros.push(new Tiros(this.ctx, xi, yi, anguloTiro, 10, true));
+        }
+        
     }
 
-    atribuirPontos(asteroide){
+    atribuirPontos(asteroide, especial){
+        let m = 1 //multiplicador de pontos
+        if(especial){
+            m = 2;
+        }
+        console.log(especial);
         switch(asteroide){
             case 1:
-                this.pontos += 50;
-                this.pontosVida += 50;
+                this.pontos += 50 * m;
+                this.pontosVida += 50 * m;
                 break;
             case 2:
-                this.pontos += 20;
-                this.pontosVida += 20;
+                this.pontos += 20 * m;
+                this.pontosVida += 20 * m;
                 break;
             case 3:
-                this.pontos += 50;
-                this.pontosVida += 50;
+                this.pontos += 50 * m;
+                this.pontosVida += 50 * m;
                 break;
             case 4:
-                this.pontos += 100;
-                this.pontosVida += 100;
+                this.pontos += 100 * m;
+                this.pontosVida += 100 * m;
                 break;
             case 'OVNI':
-                this.pontos += 1000;
-                this.pontosVida += 1000;
+                this.pontos += 1000 * m;
+                this.pontosVida += 1000 * m;
                 break;
         }
 
@@ -132,7 +143,6 @@ export default class Nave{
                 this.aX = 0
                 this.aY = 0
             }
-            console.log(i)
         }
 }
 }
