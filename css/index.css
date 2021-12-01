@@ -36,23 +36,71 @@ a:hover{
 #nave{
     transform: rotate(46deg);
     position: relative;
-    animation-name: aumentar;
-    animation-name: andar;
-    animation-duration: 5s;
-    animation-fill-mode: forwards;
+    animation: crescer 5s ease-in-out 0s infinite;
     
 }
 
+#meteoro1{
+    position: sticky;
+    animation: rodar 5s ease-in-out 0s infinite;
+    width: 70px;
+    height: 70px;
+    left: 1150px;
+    top:150px
+
+}
+
+#meteoro2{
+    position: sticky;
+    animation: rodar 5s ease-in-out 0s infinite;
+    width: 50px;
+    height: 50px;
+    left: 1350px;
+    top:200px;
+
+}
+
+#meteoro3{
+    position: sticky;
+    animation: rodar 5s ease-in-out 0s infinite;
+    width: 30px;
+    height: 30px;
+    left: 1500px;
+
+}
+
+@keyframes crescer {
+    from {width: 0px;
+         height: 0px;
+         top: 100px;
+         left: 158px;
+         
+
+    }to{
+        width: 100px;
+        height: 100px;
+        top: -250px;
+        left: 1000px;
+
+    }
+}
+
+@keyframes rodar {
+    from {transform: rotate(0deg);}
+    to{transform: rotate(360deg);}
+}
 
 
-@keyframes andar {
+
+/* @keyframes andar {
     from{top:40 px; left: 158px;}
     to{top:300 px;left: 858px;}
-}
+} */
 
-@keyframes aumentar {
+/* @keyframes aumentar {
     from{scale:0%}
     to{scale:100%}
-}
+} */
+
 
 
