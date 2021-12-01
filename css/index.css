@@ -10,6 +10,7 @@ h1,
 p,
 a{
     text-align: center;
+    font-family: 'Orbitron';
     color:white;
 }
 
@@ -33,20 +34,25 @@ a:hover{
 }
 
 #nave{
-    padding-top: 40px;
-    padding-left: 158px;
     transform: rotate(46deg);
+    position: relative;
+    animation-name: aumentar;
+    animation-name: andar;
+    animation-duration: 5s;
+    animation-fill-mode: forwards;
+    
 }
 
-#meteoro1{
-    animation: rotation 8s infinite linear;
+
+
+@keyframes andar {
+    from{top:40 px; left: 158px;}
+    to{top:300 px;left: 858px;}
 }
 
-@keyframes meteoro1 {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(359deg);
-    }
+@keyframes aumentar {
+    from{scale:0%}
+    to{scale:100%}
 }
+
+

@@ -25,9 +25,9 @@ export default class OVNI{
 
     draw(){
         //desenhar o OVNI
-        this.ctx.beginPath();
-        this.ctx.fillStyle = 'blue'
-        this.ctx.fillRect(this.x + this.colisao.x, this.y + this.colisao.y, this.img.width + this.colisao.w, this.img.height + this.colisao.h);
+        // this.ctx.beginPath();
+        // this.ctx.fillStyle = 'blue'
+        // this.ctx.fillRect(this.x + this.colisao.x, this.y + this.colisao.y, this.img.width + this.colisao.w, this.img.height + this.colisao.h);
         this.ctx.drawImage(this.img, this.x, this.y);  
     }
 

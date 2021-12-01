@@ -218,9 +218,9 @@ function render(){
             primeiroClique = true;
         }
         
-        //aceleração final
+        //desaceleração final
         if(upKey == false && primeiroClique == true){
-            nave.aceleracao()
+            nave.desaceleracao()
         }
 
         //teleportar a nave
@@ -247,12 +247,10 @@ function render(){
             
         }
 
-        //tiro (NAVE) -> asteroides (colisão)
+        //tiro (NAVE) -> asteroides
         for (let t = 0; t < nave.tiros.length; t++){
             for(let a = 0; a < asteroides.length; a++){
-                let colicao = colisoes(asteroides[a], nave.tiros[t]);
-                
-                if(colicao){ //quando o tiro entrar na area de colisão do asteroide, eliminar os dois do array
+                if(colisoes(asteroides[a], nave.tiros[t])){ //quando o tiro entrar na area de colisão do asteroide, eliminar os dois do array
                     //atribuir pontos
                     nave.atribuirPontos(asteroides[a].estagio, nave.tiros[t].especial)
                     destroirAsteroides(asteroides[a], nave.tiros[t].especial)
@@ -264,11 +262,8 @@ function render(){
 
         //tiro (NAVE) -> OVNI
         for (let t = 0; t < nave.tiros.length; t++){
-            console.log(nave.tiros[t].especial);
-            if(ovni.emJogo){
-                let colicao = colisoes(ovni, nave.tiros[t]);
-            
-                if(colicao){ //quando o tiro entrar na area de colisão do OVNI
+            if(ovni.emJogo){            
+                if(colisoes(ovni, nave.tiros[t])){ //quando o tiro entrar na area de colisão do OVNI
                     //atribuir pontos
                     nave.atribuirPontos('OVNI', nave.tiros[t].especial)
                     nave.tiros.splice(t, 1);
@@ -280,62 +275,35 @@ function render(){
         }
 
         //tiro (OVNI) -> Nave
-        for (let t = 0; t < ovni.tiros.length; t++){
-            let colicao = colisoes(nave, ovni.tiros[t]);
-            
-            if(colicao){ //quando o tiro entrar na area de colisão do OVNI
+        for (let t = 0; t < ovni.tiros.length; t++){            
+            if(colisoes(nave, ovni.tiros[t])){ //quando o tiro entrar na area de colisão do OVNI
                 ovni.tiros.splice(t, 1);
-                
-                nave.vidas--;
-                nave.x = W / 2;
-                nave.y = H / 2;
-
-                if(nave.vidas == 0){
-                    nave.vida = false;
-                }
+                nave.perderVida();
                 break;
             }
         }
 
         //nave -> asteroides (colisão)
         for (let a = 0; a < asteroides.length; a++){
-            let colicao = colisoes(asteroides[a], nave, true);
-
-            if(colicao){ //quando a nave bate contra o asteroide
+            if(colisoes(asteroides[a], nave, true)){ //quando a nave bate contra o asteroide
                 destroirAsteroides(asteroides[a])
-                nave.vidas--;
-                nave.x = W / 2;
-                nave.y = H / 2;
-
-                if(nave.vidas == 0){
-                    nave.vida = false;
-                }
+                nave.perderVida();
                 break;
             }
         }
 
         //nave -> ovni (colisão)
         if(ovni.emJogo){
-            let colicao = colisoes(ovni, nave, true);
-
-            if(colicao){ //quando a nave bate contra o OVNI
+            if(colisoes(ovni, nave, true)){ //quando a nave bate contra o OVNI
                 ovni.emJogo = false;
-                nave.vidas--;
-                nave.x = W / 2;
-                nave.y = H / 2;
-
-                if(nave.vidas == 0){
-                    nave.vida = false;
-                }
+                nave.perderVida();
             }
         }
 
         //OVNI -> asteroides (colisão)
         for (let a = 0; a < asteroides.length; a++){
             if(ovni.emJogo){
-                let colicao = colisoes(asteroides[a], ovni, true);
-
-                if(colicao){ //quando a nave bate contra o asteroide
+                if(colisoes(asteroides[a], ovni, true)){ //quando a nave bate contra o asteroide
                     destroirAsteroides(asteroides[a])
                     
                     ovni.emJogo = false;
@@ -351,9 +319,9 @@ function render(){
         ctx.fillText(`GAME OVER`, W/2, H/2);
     }
 
-    // if(asteroides.length == 0 && !ovni.emJogo){
-    //     criarAsteroides()
-    // }
+    if(asteroides.length == 0 && !ovni.emJogo){
+        criarAsteroides()
+    }
 
     //desenhar e mover os asteroides
     asteroides.forEach( asteroide => {

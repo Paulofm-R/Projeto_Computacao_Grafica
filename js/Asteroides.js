@@ -22,9 +22,9 @@ export default class Asteroides{
 
     draw(){
         //desenhar os asteroides
-        this.ctx.fillStyle = 'blue' //ponto de colição (mudar/remover depois)
-        this.ctx.beginPath();
-        this.ctx.fillRect(this.x + this.colisao.x, this.y + this.colisao.y, this.w + this.colisao.w, this.h + this.colisao.h); //ponto de colição (mudar/remover depois)
+        // this.ctx.fillStyle = 'blue' //ponto de colição (mudar/remover depois)
+        // this.ctx.beginPath();
+        // this.ctx.fillRect(this.x + this.colisao.x, this.y + this.colisao.y, this.w + this.colisao.w, this.h + this.colisao.h); //ponto de colição (mudar/remover depois)
         this.ctx.drawImage(this.img, this.x, this.y);         
     }
 
