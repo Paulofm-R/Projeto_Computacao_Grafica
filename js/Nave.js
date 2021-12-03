@@ -40,6 +40,7 @@ export default class Nave{
     }
 
     mover(){
+        
         if(this.aX <= 10 && this.aY <= 10){
             this.aX += 0.1 ;
             this.aY += 0.1 ;
@@ -78,26 +79,22 @@ export default class Nave{
         
     }
 
-    atribuirPontos(asteroide, especial){
+    atribuirPontos(inimigo, especial){
         let m = 1 //multiplicador de pontos
         if(especial){
             m = 2;
         }
-        console.log(especial);
-        switch(asteroide){
+
+        switch(inimigo){
             case 1:
-                this.pontos += 50 * m;
-                this.pontosVida += 50 * m;
-                break;
-            case 2:
                 this.pontos += 20 * m;
                 this.pontosVida += 20 * m;
                 break;
-            case 3:
+            case 2:
                 this.pontos += 50 * m;
                 this.pontosVida += 50 * m;
                 break;
-            case 4:
+            case 3:
                 this.pontos += 100 * m;
                 this.pontosVida += 100 * m;
                 break;
@@ -114,10 +111,16 @@ export default class Nave{
     }
 
     desaceleracao(){
+        console.log(this.aX);
         if(this.aX > 0 && this.aY > 0){
             this.aX -= 0.1 ;
             this.aY -= 0.1 ;
-        }   
+        }
+        
+        if(this.aX < 0 && this.aY < 0){
+            this.aX = 0 ;
+            this.aY = 0 ;
+        }
 
         this.x += this.aX * (2 * Math.cos(this.angulo - (90 / 180 * Math.PI)))
         this.y += this.aY * (2 * Math.sin(this.angulo - (90 / 180 * Math.PI)))

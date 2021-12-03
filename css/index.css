@@ -1,3 +1,10 @@
+@font-face {
+    font-family: 'Orbitron';
+    src: url(../font/static/Orbitron-Medium.ttf) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body{
     background-image: url('../img/fundo_inicial.png');
     background-size: 98%;
@@ -69,6 +76,40 @@ a:hover{
 
 }
 
+#meteoro4{
+    position: sticky;
+    animation: rodar 5s ease-in-out 0s infinite;
+    width: 40px;
+    height: 40px;
+    left: 1350px;
+    top: 70px;
+
+}
+#meteoro5{
+    position: sticky;
+    animation: rodar 5s ease-in-out 0s infinite;
+    width: 30px;
+    height: 30px;
+    left: 1000px;
+    top: 50px
+
+}
+#meteoro6{
+    position: sticky;
+    animation: rodar 5s ease-in-out 0s infinite;
+    width: 30px;
+    height: 30px;
+    left: 1250px;
+
+}
+
+#criadores{
+    position: fixed;
+    bottom: 8px;
+    right: 16px;
+    font-size: 12px;
+}
+
 @keyframes crescer {
     from {width: 0px;
          height: 0px;
@@ -92,15 +133,6 @@ a:hover{
 
 
 
-/* @keyframes andar {
-    from{top:40 px; left: 158px;}
-    to{top:300 px;left: 858px;}
-} */
-
-/* @keyframes aumentar {
-    from{scale:0%}
-    to{scale:100%}
-} */
 
 
 

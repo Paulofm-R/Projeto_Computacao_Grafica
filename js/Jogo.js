@@ -1,5 +1,4 @@
 import Nave from "./Nave.js";
-import Tiros from "./Tiros.js";
 import Asteroides from "./Asteroides.js";
 import OVNI from "./OVNI.js";
 
@@ -7,7 +6,7 @@ const canvas = document.querySelector("#canvas");
 const ctx = canvas.getContext("2d");
 
 //colocar em tela cheia
-canvas.width  = window.innerWidth - 5;
+canvas.width  = window.innerWidth - 1;
 canvas.height = window.innerHeight - 5;
 
 const W = canvas.width;
@@ -35,7 +34,6 @@ loadImage('Nave');
 loadImage("Meteoro 1");
 loadImage("Meteoro 2");
 loadImage("Meteoro 3");
-loadImage("Meteoro 4");
 loadImage("Ovni");
 
 //array de asteroides
@@ -72,6 +70,9 @@ function KeyPressed(e){
         space = true;
         spaceTimer = 5;
         timer = window.setInterval(teleportTimer, 1000);
+    }
+    if (e.key == 'Enter' && !nave.vida){  //quando ficar sem vidas, dar opção de o jogador de voltar a jogar
+        location.reload();
     }
 }
 
@@ -111,32 +112,30 @@ function teleportTimer(){
  * colisões
  * @param {object} obj1 objeto de colição um 
  * @param {object} obj2 objeto de colição dois
- * @param {object} nave se a nave
  * @returns 
  */
-function colisoes(obj1, obj2, nave = false){
-    if (nave){
-        if ((Math.floor(obj1.x + obj1.colisao.x)) + (obj1.w + obj1.colisao.w) < (obj2.x + obj2.colisao.x) || 
-        (Math.floor(obj1.x + obj1.colisao.x)) > (obj2.x + obj2.colisao.x) + (obj2.w + obj2.colisao.w) ||
-        (Math.floor(obj1.y + obj1.colisao.y)) + (obj1.h + obj1.colisao.h) < (obj2.y + obj2.colisao.y) ||
-        (Math.floor(obj1.y + obj1.colisao.y)) > (obj2.y + obj2.colisao.y) + (obj2.h + obj2.colisao.h)) {
-        return false;
+function colisoes(obj1, obj2) {
+    if ((obj1.x + obj1.colisao.x) + (obj1.w + obj1.colisao.w) < (obj2.x + obj2.colisao.x) || 
+    (obj1.x + obj1.colisao.x) > (obj2.x + obj2.colisao.x) + (obj2.w + obj2.colisao.w) ||
+    (obj1.y + obj1.colisao.y) + (obj1.h + obj1.colisao.h) < (obj2.y + obj2.colisao.y) ||
+    (obj1.y + obj1.colisao.y) > (obj2.y + obj2.colisao.y) + (obj2.h + obj2.colisao.h)) {
+    return false;
     } 
     else {
         return true;
-        }
     }
-    else{
-        if ((Math.floor(obj1.x + obj1.colisao.x)) + (obj1.w + obj1.colisao.w) < obj2.x || 
-        (Math.floor(obj1.x + obj1.colisao.x)) > obj2.x + obj2.w ||
-        (Math.floor(obj1.y + obj1.colisao.y)) + (obj1.h + obj1.colisao.h) < obj2.y ||
-        (Math.floor(obj1.y + obj1.colisao.y)) > obj2.y + obj2.h) {
-        return false;
-    } 
-    else { 
-        return true;
+}
+
+function colisaoTiros(tiro, obj){
+    if (tiro.x + tiro.t < (obj.x + obj.colisao.x) || 
+        tiro.x > (obj.x + obj.colisao.x) + (obj.w + obj.colisao.w) ||
+        tiro.y + tiro.t < (obj.y + obj.colisao.y) ||
+        tiro.y > (obj.y + obj.colisao.y) + (obj.h + obj.colisao.h)) {
+            return false;
+        } 
+        else { 
+            return true;
         }
-    }
 }
 
 //criar ovni
@@ -177,24 +176,28 @@ function criarAsteroides() {
             yInit = Math.random() * H + H * 3/4;
         }    
 
-        asteroides.push(new Asteroides(ctx, xInit, yInit, direcao, imagens['Meteoro 2'], 2, W, H));
+        asteroides.push(new Asteroides(ctx, xInit, yInit, direcao, imagens['Meteoro 1'], 1, W, H));
     }
 
     numAsteroides += 2;
 }
 
-function destroirAsteroides(asteroide, especial = false) {
-    if(asteroide.estagio < 4 && !especial){
-        asteroide.estagio++
+function destruirAsteroides(index, especial = false) {
+    let x = asteroides[index].x;
+    let y = asteroides[index].y;
+    let estado = asteroides[index].estado;
+
+    if(estado < 3 && !especial){
+        estado++
 
         for (let i = 0; i < 2; i++){
             let direcao = Math.random() * 2 * Math.PI;
             
-            asteroides.push(new Asteroides(ctx, asteroide.x, asteroide.y, direcao, imagens[`Meteoro ${asteroide.estagio}`], asteroide.estagio, W, H));
+            asteroides.push(new Asteroides(ctx, x, y, direcao, imagens[`Meteoro ${estado}`], estado, W, H));
         }
     }
 
-    asteroides.splice(asteroide, 1);
+    asteroides.splice(index, 1);
 }
 
 function carregarEspecial(){
@@ -247,13 +250,13 @@ function render(){
             
         }
 
-        //tiro (NAVE) -> asteroides
+        // tiro (NAVE) -> asteroides
         for (let t = 0; t < nave.tiros.length; t++){
             for(let a = 0; a < asteroides.length; a++){
-                if(colisoes(asteroides[a], nave.tiros[t])){ //quando o tiro entrar na area de colisão do asteroide, eliminar os dois do array
+                if(colisaoTiros(nave.tiros[t], asteroides[a])){ //quando o tiro entrar na area de colisão do asteroide, eliminar os dois do array
                     //atribuir pontos
-                    nave.atribuirPontos(asteroides[a].estagio, nave.tiros[t].especial)
-                    destroirAsteroides(asteroides[a], nave.tiros[t].especial)
+                    nave.atribuirPontos(asteroides[a].estado, nave.tiros[t].especial)
+                    destruirAsteroides(a, nave.tiros[t].especial)
                     nave.tiros.splice(t, 1);
                     break
                 }
@@ -263,7 +266,7 @@ function render(){
         //tiro (NAVE) -> OVNI
         for (let t = 0; t < nave.tiros.length; t++){
             if(ovni.emJogo){            
-                if(colisoes(ovni, nave.tiros[t])){ //quando o tiro entrar na area de colisão do OVNI
+                if(colisaoTiros(nave.tiros[t], ovni)){ //quando o tiro entrar na area de colisão do OVNI
                     //atribuir pontos
                     nave.atribuirPontos('OVNI', nave.tiros[t].especial)
                     nave.tiros.splice(t, 1);
@@ -276,7 +279,7 @@ function render(){
 
         //tiro (OVNI) -> Nave
         for (let t = 0; t < ovni.tiros.length; t++){            
-            if(colisoes(nave, ovni.tiros[t])){ //quando o tiro entrar na area de colisão do OVNI
+            if(colisaoTiros(ovni.tiros[t], nave)){ //quando o tiro entrar na area de colisão do OVNI
                 ovni.tiros.splice(t, 1);
                 nave.perderVida();
                 break;
@@ -285,8 +288,8 @@ function render(){
 
         //nave -> asteroides (colisão)
         for (let a = 0; a < asteroides.length; a++){
-            if(colisoes(asteroides[a], nave, true)){ //quando a nave bate contra o asteroide
-                destroirAsteroides(asteroides[a])
+            if(colisoes(asteroides[a], nave)){ //quando a nave bate contra o asteroide
+                destruirAsteroides(a)
                 nave.perderVida();
                 break;
             }
@@ -300,11 +303,11 @@ function render(){
             }
         }
 
-        //OVNI -> asteroides (colisão)
+        // //OVNI -> asteroides (colisão)
         for (let a = 0; a < asteroides.length; a++){
             if(ovni.emJogo){
                 if(colisoes(asteroides[a], ovni, true)){ //quando a nave bate contra o asteroide
-                    destroirAsteroides(asteroides[a])
+                    destruirAsteroides(a)
                     
                     ovni.emJogo = false;
                     break;
@@ -317,6 +320,8 @@ function render(){
         ctx.textAlign = 'center';
         ctx.font = 'bold 50px sans-serif';
         ctx.fillText(`GAME OVER`, W/2, H/2);
+        ctx.font = 'bold 25px sans-serif';
+        ctx.fillText(`Press ENTER to play again`, W/2, H/2 + 45);
     }
 
     if(asteroides.length == 0 && !ovni.emJogo){
@@ -367,10 +372,10 @@ function render(){
     ctx.fillStyle = 'White';
     ctx.textAlign = 'left';
     ctx.font = 'bold 20px sans-serif';
-    ctx.fillText(`VIDAS: ${nave.vidas}`, 35, 40);
+    ctx.fillText(`LIVES: ${nave.vidas}`, 35, 40);
     
     //pontuação atual do jogador
-    ctx.fillText(`Pontuação: ${nave.pontos}`, 35, 70);
+    ctx.fillText(`SCORE: ${nave.pontos}`, 35, 70);
 
     //circulo com o tempo até o teleporte
     ctx.beginPath();
@@ -378,14 +383,14 @@ function render(){
     ctx.arc(W - 175, H - 60, 50, 0, 2 * Math.PI);
     ctx.stroke();
     ctx.textAlign = 'center';
-    ctx.fillText(spaceTimer, W - 175, H - 50);
+    ctx.fillText(spaceTimer > 0 ? spaceTimer : 'Space', W - 175, H - 53);
 
     //circulo com o tempo até a habilidade
     ctx.beginPath();
     ctx.strokeStyle = 'White';
     ctx.arc(W - 75, H - 125, 50, 0, 2 * Math.PI);
     ctx.stroke();
-    ctx.fillText(especialTimer, W - 75, H - 115);
+    ctx.fillText(especialTimer > 0 ? especialTimer : 'FIRE', W - 75, H - 115);
 
 
     window.requestAnimationFrame(render);
@@ -402,8 +407,7 @@ canvas.addEventListener('mousedown', (e) => {
 })
 
 setInterval(novOVNI, 30000);
-// setInterval(tirOVNI, 1000);
+setInterval(tirOVNI, 1000);
 setInterval(carregarEspecial, 1000)
-
 
 window.onload = () => render()  //chamar a função render depois de carregar a pagina
