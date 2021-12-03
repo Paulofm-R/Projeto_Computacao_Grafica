@@ -318,9 +318,9 @@ function render(){
     else{
         ctx.fillStyle = 'White';
         ctx.textAlign = 'center';
-        ctx.font = 'bold 50px sans-serif';
+        ctx.font = 'bold 50px Orbitron';
         ctx.fillText(`GAME OVER`, W/2, H/2);
-        ctx.font = 'bold 25px sans-serif';
+        ctx.font = 'bold 25px Orbitron';
         ctx.fillText(`Press ENTER to play again`, W/2, H/2 + 45);
     }
 
@@ -371,7 +371,7 @@ function render(){
     //quantidade de vidas na tela
     ctx.fillStyle = 'White';
     ctx.textAlign = 'left';
-    ctx.font = 'bold 20px sans-serif';
+    ctx.font = 'bold 20px Orbitron';
     ctx.fillText(`LIVES: ${nave.vidas}`, 35, 40);
     
     //pontuação atual do jogador

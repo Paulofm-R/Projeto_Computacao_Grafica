@@ -1,8 +1,6 @@
 @font-face {
     font-family: 'Orbitron';
-    src: url(../font/static/Orbitron-Medium.ttf) format('truetype');
-    font-weight: normal;
-    font-style: normal;
+    src: url(../font/static/Orbitron-Medium.ttf);
 }
 
 body{
@@ -43,60 +41,60 @@ a:hover{
 #nave{
     transform: rotate(46deg);
     position: relative;
-    animation: crescer 5s ease-in-out 0s infinite;
+    animation: crescer 10s ease-in-out 0s infinite;
     
 }
 
 #meteoro1{
     position: sticky;
-    animation: rodar 5s ease-in-out 0s infinite;
+    animation: rodar 5s linear 0s infinite;
     width: 70px;
     height: 70px;
     left: 1150px;
-    top:150px
+    top:152px
 
 }
 
 #meteoro2{
     position: sticky;
-    animation: rodar 5s ease-in-out 0s infinite;
+    animation: rodar 5s linear 0s infinite;
     width: 50px;
     height: 50px;
     left: 1350px;
-    top:200px;
+    top:220px;
 
 }
 
 #meteoro3{
     position: sticky;
-    animation: rodar 5s ease-in-out 0s infinite;
-    width: 30px;
-    height: 30px;
+    animation: rodar 5s linear 0s infinite;
+    width: 25px;
+    height: 25px;
     left: 1500px;
 
 }
 
 #meteoro4{
     position: sticky;
-    animation: rodar 5s ease-in-out 0s infinite;
+    animation: rodar 5s linear 0s infinite;
     width: 40px;
     height: 40px;
     left: 1350px;
-    top: 70px;
+    top: 75px;
 
 }
 #meteoro5{
     position: sticky;
-    animation: rodar 5s ease-in-out 0s infinite;
-    width: 30px;
-    height: 30px;
-    left: 1000px;
-    top: 50px
+    animation: rodar 5s linear 0s infinite;
+    width: 20px;
+    height: 20px;
+    left: 1100px;
+    top: 20px
 
 }
 #meteoro6{
     position: sticky;
-    animation: rodar 5s ease-in-out 0s infinite;
+    animation: rodar 5s linear 0s infinite;
     width: 30px;
     height: 30px;
     left: 1250px;
