@@ -13,11 +13,10 @@ const W = canvas.width;
 const H = canvas.height;
 
 //setas
-let upKey = false;
-let primeiroClique = false
+let wKey = false;
 
 //teleporte
-let space = false;
+let espacoKey = false;
 let spaceTimer = 0;
 let timer
 
@@ -56,7 +55,7 @@ function loadImage(name){
 //clicar numa tecla
 function KeyPressed(e){
     if (e.key == 'w'){
-        upKey = true;
+        wKey = true;
     }
     if (e.key == 'a'){
         //roda o angulo para a esquerda
@@ -67,7 +66,7 @@ function KeyPressed(e){
         nave.rotacao = 5 / 180 * Math.PI
     }
     if (e.key == ' ' && spaceTimer == 0){
-        space = true;
+        espacoKey = true;
         spaceTimer = 5;
         timer = window.setInterval(teleportTimer, 1000);
     }
@@ -80,7 +79,7 @@ function KeyPressed(e){
 function KeyReleased(e){
     switch (e.key){
         case "w":
-            upKey = false;
+            wKey = false;
             break;
         case "a":
             nave.rotacao = 0;
@@ -89,7 +88,7 @@ function KeyReleased(e){
             nave.rotacao = 0;
             break;
         case ' ':
-            space = false;
+            espacoKey = false;
             break;
     }
 }
@@ -145,6 +144,7 @@ function novOVNI(){
     }
 }
 
+//fazer com que o ovni dispara
 function tirOVNI(){
     if(ovni.emJogo){
         ovni.disparar(nave.x - nave.w/2, nave.y - nave.h/2)
@@ -211,25 +211,23 @@ function carregarEspecial(){
 
 //render
 function render(){
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);  //limpar o canvas
 
     //quando a nave tiver vidas
     if(nave.vida){        
-        //mover a nave
-        if (upKey) {
-            nave.mover()
-            primeiroClique = true;
+        if (wKey) {
+            //mover a nave
+            nave.aceleracao()
         }
-        
-        //desaceleração final
-        if(upKey == false && primeiroClique == true){
+        else {
+            // desacelerar até parar a nave
             nave.desaceleracao()
         }
 
         //teleportar a nave
-        if (space){
+        if (espacoKey){
             teleport()
-            space = false;
+            espacoKey = false;
         }
 
         //pintar a nave
@@ -244,10 +242,6 @@ function render(){
                 especial = false;
                 especialTimer = 30;
             }
-        }
-
-        if(especialTimer == 30){
-            
         }
 
         // tiro (NAVE) -> asteroides
@@ -315,15 +309,16 @@ function render(){
             }
         }
     }
-    else{
+    else{ //tela de game over
         ctx.fillStyle = 'White';
         ctx.textAlign = 'center';
         ctx.font = 'bold 50px Orbitron';
         ctx.fillText(`GAME OVER`, W/2, H/2);
-        ctx.font = 'bold 25px Orbitron';
-        ctx.fillText(`Press ENTER to play again`, W/2, H/2 + 45);
+        ctx.font = 'bold 20px Orbitron';
+        ctx.fillText(`Press ENTER to play again`, W/2, H/2 + 50);
     }
 
+    //fazer aparecer mais asteroides quando o número de asteroides for igual a 0 e o ovni não estiver no jogo
     if(asteroides.length == 0 && !ovni.emJogo){
         criarAsteroides()
     }
@@ -339,11 +334,25 @@ function render(){
         tiro.draw();
         tiro.update();
 
-        //retirar tiros
-        if(tiro.x < 0) nave.tiros.shift()
-        else if(tiro.x > W) nave.tiros.shift()
-        else if(tiro.y < 0) nave.tiros.shift()
-        else if(tiro.y > H) nave.tiros.shift()
+        //retirar tiros (0.6 é um valor para ajustar quanto o tiro vai andar)
+        if (tiro.distancia > W * 0.6){
+            nave.tiros.shift()
+        }
+
+        //quando o tiro passar o limite do canvas, passar para o outro lado
+        if (tiro.y < -tiro.t){
+            tiro.y = H;
+        }
+        if (tiro.y > H + tiro.t){
+            tiro.y = -tiro.t;
+        }
+        if (tiro.x > W + tiro.t){
+            tiro.x = -tiro.t;
+        }
+        if (tiro.x < -tiro.t){
+            tiro.x = W;
+        }
+        
     })
 
     if(ovni.emJogo){
@@ -406,7 +415,7 @@ canvas.addEventListener('mousedown', (e) => {
     yR = e.clientY;
 })
 
-setInterval(novOVNI, 30000);
+setInterval(novOVNI, 25000);
 setInterval(tirOVNI, 1000);
 setInterval(carregarEspecial, 1000)
 

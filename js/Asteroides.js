@@ -6,7 +6,7 @@ export default class Asteroides{
         this.dX = 2 * Math.cos(d); //direção do asteroide em x
         this.dY = 2 * Math.sin(d); //direção do asteroide em y
         this.img = img; //imagem do asteroide
-        this.estado = estado;
+        this.estado = estado;  //se esta no 1/2/3 estado de tamanho
         this.colisao = { //correção para as coordenadas de colisao
             x: 5, 
             y: 5, 
@@ -22,19 +22,17 @@ export default class Asteroides{
 
     draw(){
         //desenhar os asteroides
-        // this.ctx.fillStyle = 'blue' //ponto de colição (mudar/remover depois)
-        // this.ctx.beginPath();
-        // this.ctx.fillRect(this.x + this.colisao.x, this.y + this.colisao.y, this.w + this.colisao.w, this.h + this.colisao.h); //ponto de colição (mudar/remover depois)
         this.ctx.drawImage(this.img, this.x, this.y);    
     }
 
     update(){
-        // atualizar a posição dos asteroides
-        if (this.x < -120) this.x = this.W
-        if (this.x > this.W) this.x = -120
-        if (this.y < -68)  this.y = this.H
-        if (this.y > this.H) this.y = -68
+        //quando o asteroide passar o limite do canvas, passar para o outro lado
+        if (this.x < -this.w) this.x = this.W
+        if (this.x > this.W) this.x = -this.w
+        if (this.y < -this.h)  this.y = this.H
+        if (this.y > this.H) this.y = -this.h
 
+        // atualizar a posição dos asteroides
         this.x += this.dX;
         this.y += this.dY;
     }

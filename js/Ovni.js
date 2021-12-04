@@ -3,41 +3,46 @@ import Tiros from "./Tiros.js";
 //definição dos OVNI
 export default class OVNI{
     constructor(ctx, imagem, W, H){
-        this.x = 0; 
-        this.y = 0; 
+        this.x = 0; //posição da ovni em x
+        this.y = 0; //posição da ovni em y
         this.dX = 0; //direção do ovni em x
         this.dY = 0; //direção do ovni em y
-        this.tiros = [];
+        this.tiros = []; //array para guardar todos tiros do ovni
         this.colisao = { //correção para as coordenadas de colisao
             x: 7, 
             y: 7, 
             w: -12, 
             h: -12
         }; 
-        this.emJogo = false;
+        this.emJogo = false; //se o onvi esta vivo ou não
         this.img = imagem;
-        this.w = imagem.width;
-        this.h = imagem.height;
+        this.w = 170; //largura
+        this.h = 80; //altura
         this.ctx = ctx;
         this.W = W;
         this.H = H;
     }
 
+    /**
+     * Desenhar o OVNI
+     */
     draw(){
-        //desenhar o OVNI
-        // this.ctx.beginPath();
-        // this.ctx.fillStyle = 'blue'
-        // this.ctx.fillRect(this.x + this.colisao.x, this.y + this.colisao.y, this.img.width + this.colisao.w, this.img.height + this.colisao.h);
-        this.ctx.drawImage(this.img, this.x, this.y);  
+        this.ctx.drawImage(this.img, this.x, this.y, this.w, this.h);  
     }
 
+    /**
+     * Atualizar a posição dos ovni
+     */
     update(){
-        // atualizar a posição dos ovni
         this.x += this.dX;
         this.y += this.dY;
     }
 
+    /**
+     * Criar um novo OVNI
+     */
     criarOVNI(){
+        //direção do ovni
         let direcao = Math.random() * 2 * Math.PI;
         this.dX = 2 * Math.cos(direcao);
         this.dY = 2 * Math.sin(direcao);
@@ -60,9 +65,14 @@ export default class OVNI{
             this.y = this.H;
         }
         
-        this.emJogo = true;
+        this.emJogo = true; //dizer que o ovni esta dentro do canvas
     }
 
+    /**
+     * 
+     * @param {float} x posição atual da nave em x
+     * @param {float} y posição atual da nave em y
+     */
     disparar(x, y){
         let anguloTiro = Math.atan2(y - this.y, x - this.x);
 
