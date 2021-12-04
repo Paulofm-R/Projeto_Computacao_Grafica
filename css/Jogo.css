@@ -1,0 +1,15 @@
+@font-face {
+    font-family: 'Orbitron';
+    src: url(../font/static/Orbitron-Medium.ttf);
+}
+
+body{
+    margin:0;
+    padding:0;
+    cursor:crosshair; 
+    background-image: url('../img/fundo_jogo.png');
+    background-position: center;
+    background-size: 90%;
+    background-color: black;
+    
+}

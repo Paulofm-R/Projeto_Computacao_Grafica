@@ -1,7 +1,7 @@
 function KeyPressed(e){
     switch(e.key){
         case 'Enter':
-            location.href = '../Asteroids.html';
+            location.href = '../Jogo.html';
     }
 }
 

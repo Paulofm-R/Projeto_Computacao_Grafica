@@ -1,11 +1,21 @@
+@font-face {
+    font-family: 'Orbitron';
+    src: url(../font/static/Orbitron-Medium.ttf);
+}
+
 body{
+    background-image: url('../img/fundo_inicial.png');
+    background-size: 98%;
+    background-repeat: no-repeat;
     background-color: black;
+    
 }
 
 h1,
 p,
 a{
     text-align: center;
+    font-family: 'Orbitron';
     color:white;
 }
 
@@ -27,3 +37,100 @@ a:hover{
     background-color: rgba(37, 37, 37, 0.295);
     color:rgb(199, 199, 199);
 }
+
+#nave{
+    transform: rotate(46deg);
+    position: relative;
+    animation: crescer 10s ease-in-out 0s infinite;
+    
+}
+
+#meteoro1{
+    position: sticky;
+    animation: rodar 5s linear 0s infinite;
+    width: 70px;
+    height: 70px;
+    left: 1150px;
+    top:152px
+
+}
+
+#meteoro2{
+    position: sticky;
+    animation: rodar 5s linear 0s infinite;
+    width: 50px;
+    height: 50px;
+    left: 1350px;
+    top:220px;
+
+}
+
+#meteoro3{
+    position: sticky;
+    animation: rodar 5s linear 0s infinite;
+    width: 25px;
+    height: 25px;
+    left: 1500px;
+
+}
+
+#meteoro4{
+    position: sticky;
+    animation: rodar 5s linear 0s infinite;
+    width: 40px;
+    height: 40px;
+    left: 1350px;
+    top: 75px;
+
+}
+#meteoro5{
+    position: sticky;
+    animation: rodar 5s linear 0s infinite;
+    width: 20px;
+    height: 20px;
+    left: 1100px;
+    top: 20px
+
+}
+#meteoro6{
+    position: sticky;
+    animation: rodar 5s linear 0s infinite;
+    width: 30px;
+    height: 30px;
+    left: 1250px;
+
+}
+
+#criadores{
+    position: fixed;
+    bottom: 8px;
+    right: 16px;
+    font-size: 12px;
+}
+
+@keyframes crescer {
+    from {width: 0px;
+         height: 0px;
+         top: 100px;
+         left: 158px;
+         
+
+    }to{
+        width: 100px;
+        height: 100px;
+        top: -250px;
+        left: 1000px;
+
+    }
+}
+
+@keyframes rodar {
+    from {transform: rotate(0deg);}
+    to{transform: rotate(360deg);}
+}
+
+
+
+
+
+
