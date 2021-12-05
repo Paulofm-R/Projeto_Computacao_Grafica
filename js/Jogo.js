@@ -40,9 +40,9 @@ let asteroides = [];
 let numAsteroides = 5 //numero de asteroides
 
 //ovni
-let ovni = new OVNI(ctx, imagens['Ovni'], W, H);;
+let ovni = new OVNI(ctx, imagens['Ovni'], W, H);
 
-//inivializar nave
+//inicializar nave
 let nave = new Nave(ctx, W, H, imagens['Nave']);
 
 //function
@@ -297,7 +297,7 @@ function render(){
             }
         }
 
-        // //OVNI -> asteroides (colisão)
+        //OVNI -> asteroides (colisão)
         for (let a = 0; a < asteroides.length; a++){
             if(ovni.emJogo){
                 if(colisoes(asteroides[a], ovni, true)){ //quando a nave bate contra o asteroide

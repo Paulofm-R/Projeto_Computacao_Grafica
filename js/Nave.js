@@ -98,17 +98,17 @@ export default class Nave{
      */
     disparar(xR, yR, especial){
         //direção do tiro
-        let diracao = Math.atan2(yR - this.y, xR - this.x);
+        let direcao = Math.atan2(yR - this.y, xR - this.x);
 
         //posição sem rotação da nave
         let xi = this.x + this.w/2 * Math.cos(this.angulo - (90 / 180 * Math.PI));
         let yi = this.y + this.h/2 * Math.sin(this.angulo - (90 / 180 * Math.PI));
 
         if(!especial){
-            this.tiros.push(new Tiros(this.ctx, xi, yi, diracao, 5));
+            this.tiros.push(new Tiros(this.ctx, xi, yi, direcao, 5));
         }
         else{
-            this.tiros.push(new Tiros(this.ctx, xi, yi, diracao, 10, true));
+            this.tiros.push(new Tiros(this.ctx, xi, yi, direcao, 10, true));
         }
     }
 
