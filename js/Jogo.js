@@ -93,7 +93,7 @@ function KeyReleased(e){
     }
 }
 
-//teleportar a nave
+//teletransportar a nave
 function teleport(){
     nave.x = Math.floor(Math.random() * W);
     nave.y = Math.floor(Math.random() * H);
@@ -118,10 +118,10 @@ function colisoes(obj1, obj2) {
     (obj1.x + obj1.colisao.x) > (obj2.x + obj2.colisao.x) + (obj2.w + obj2.colisao.w) ||
     (obj1.y + obj1.colisao.y) + (obj1.h + obj1.colisao.h) < (obj2.y + obj2.colisao.y) ||
     (obj1.y + obj1.colisao.y) > (obj2.y + obj2.colisao.y) + (obj2.h + obj2.colisao.h)) {
-    return false;
+    return false;   //objetos não colidiram
     } 
     else {
-        return true;
+        return true;    //objetos colidiram
     }
 }
 
@@ -130,10 +130,10 @@ function colisaoTiros(tiro, obj){
         tiro.x > (obj.x + obj.colisao.x) + (obj.w + obj.colisao.w) ||
         tiro.y + tiro.t < (obj.y + obj.colisao.y) ||
         tiro.y > (obj.y + obj.colisao.y) + (obj.h + obj.colisao.h)) {
-            return false;
+            return false;   //tiro não colidiu com nenhum objeto
         } 
         else { 
-            return true;
+            return true;    //tiro colidiu com objeto
         }
 }
 
@@ -201,11 +201,11 @@ function destruirAsteroides(index, especial = false) {
 }
 
 function carregarEspecial(){
-    if(especialTimer == 0) {
-        especial = true;
+    if(especialTimer == 0) { 
+        especial = true; //ativa a possibilidade de disparar
     }
     else if(especialTimer > 0){
-        especialTimer--
+        especialTimer-- //diminui o tempo caso a variavel seja superior a 0
     }
 }
 
@@ -224,7 +224,7 @@ function render(){
             nave.desaceleracao()
         }
 
-        //teleportar a nave
+        //teletransportar a nave
         if (espacoKey){
             teleport()
             espacoKey = false;
@@ -291,7 +291,7 @@ function render(){
 
         //nave -> ovni (colisão)
         if(ovni.emJogo){
-            if(colisoes(ovni, nave, true)){ //quando a nave bate contra o OVNI
+            if(colisoes(ovni, nave)){ //quando a nave bate contra o OVNI
                 ovni.emJogo = false;
                 nave.perderVida();
             }
@@ -300,7 +300,7 @@ function render(){
         //OVNI -> asteroides (colisão)
         for (let a = 0; a < asteroides.length; a++){
             if(ovni.emJogo){
-                if(colisoes(asteroides[a], ovni, true)){ //quando a nave bate contra o asteroide
+                if(colisoes(asteroides[a], ovni)){ //quando a nave bate contra o asteroide
                     destruirAsteroides(a)
                     
                     ovni.emJogo = false;
@@ -341,16 +341,16 @@ function render(){
 
         //quando o tiro passar o limite do canvas, passar para o outro lado
         if (tiro.y < -tiro.t){
-            tiro.y = H;
+            tiro.y = H; //aparece em baixo
         }
         if (tiro.y > H + tiro.t){
-            tiro.y = -tiro.t;
+            tiro.y = -tiro.t; //aparece em cima
         }
         if (tiro.x > W + tiro.t){
-            tiro.x = -tiro.t;
+            tiro.x = -tiro.t;   //aparece do lado esquerdo
         }
         if (tiro.x < -tiro.t){
-            tiro.x = W;
+            tiro.x = W; //aparece do lado direito
         }
         
     })
@@ -401,14 +401,13 @@ function render(){
     ctx.stroke();
     ctx.fillText(especialTimer > 0 ? especialTimer : 'FIRE', W - 75, H - 115);
 
-
     window.requestAnimationFrame(render);
 }
 
 window.addEventListener('keydown', KeyPressed);
 window.addEventListener('keyup', KeyReleased);
 
-//receber a infoção do click do rato e das coordenadas
+//receber a informação do click do rato e das coordenadas
 canvas.addEventListener('mousedown', (e) => {
     click = true
     xR = e.clientX;
