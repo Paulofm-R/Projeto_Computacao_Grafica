@@ -340,7 +340,7 @@ function render(){
         tiro.update();
 
         //retirar tiros (0.75 é um valor para ajustar quanto o tiro vai andar)
-        if (tiro.distancia > W * 0.75){
+        if (tiro.distancia > W * 0.6){
             nave.tiros.shift()
         }
 
