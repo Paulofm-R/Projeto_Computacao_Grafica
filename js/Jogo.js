@@ -41,6 +41,7 @@ let numAsteroides = 5 //numero de asteroides
 
 //ovni
 let ovni = new OVNI(ctx, imagens['Ovni'], W, H);
+let tirOvni_timer
 
 //inicializar nave
 let nave = new Nave(ctx, W, H, imagens['Nave']);
@@ -99,7 +100,7 @@ function teleport(){
     nave.y = Math.floor(Math.random() * H);
 }
 
-//tempo de espera para poder teleportar novamente
+//tempo de espera para poder teletransportar novamente
 function teleportTimer(){
     spaceTimer--;
     if (spaceTimer == 0){
@@ -140,14 +141,18 @@ function colisaoTiros(tiro, obj){
 //criar ovni
 function novOVNI(){
     if(!ovni.emJogo){
-        ovni.criarOVNI()
+        ovni.criarOVNI();
+        tirOvni_timer = window.setInterval(tirOVNI, 1000);
     }
 }
 
 //fazer com que o ovni dispara
 function tirOVNI(){
-    if(ovni.emJogo){
-        ovni.disparar(nave.x - nave.w/2, nave.y - nave.h/2)
+    if(ovni.emJogo && nave.vida){ //disparar quando o ovni e a nave estam no jogo
+        ovni.disparar(nave.x, nave.y)
+    }
+    else{ //limpar o temporizador quando o onvi sair do jogo
+        clearInterval(tirOvni_timer)
     }
 }
 
@@ -334,8 +339,8 @@ function render(){
         tiro.draw();
         tiro.update();
 
-        //retirar tiros (0.6 é um valor para ajustar quanto o tiro vai andar)
-        if (tiro.distancia > W * 0.6){
+        //retirar tiros (0.75 é um valor para ajustar quanto o tiro vai andar)
+        if (tiro.distancia > W * 0.75){
             nave.tiros.shift()
         }
 
@@ -414,8 +419,7 @@ canvas.addEventListener('mousedown', (e) => {
     yR = e.clientY;
 })
 
-setInterval(novOVNI, 25000);
-setInterval(tirOVNI, 1000);
+setInterval(novOVNI, 25000); //criar um ovni 25 em 25 segundos
 setInterval(carregarEspecial, 1000)
 
 window.onload = () => render()  //chamar a função render depois de carregar a pagina
