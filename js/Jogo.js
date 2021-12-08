@@ -29,11 +29,11 @@ let yR;
 
 //imagens
 let imagens = {}
-loadImage('Nave');
-loadImage("Meteoro 1");
-loadImage("Meteoro 2");
-loadImage("Meteoro 3");
-loadImage("Ovni");
+loadImageSVG('Nave');
+loadImagePNG("Meteoro 1");
+loadImagePNG("Meteoro 2");
+loadImagePNG("Meteoro 3");
+loadImageSVG("Ovni");
 
 //array de asteroides
 let asteroides = [];
@@ -48,13 +48,21 @@ let nave = new Nave(ctx, W, H, imagens['Nave']);
 
 //function
 /**
- * carregar imagens
+ * carregar imagens .png
  * @param {string} name nome da imagem
  */
-function loadImage(nome){
+function loadImagePNG(nome){
     imagens[nome] = new Image();
     imagens[nome].src = 'img/' + nome + '.png';
-    console.log(imagens);
+}
+
+/**
+ * carregar imagens .svg
+ * @param {string} name nome da imagem
+ */
+ function loadImageSVG(nome){
+    imagens[nome] = new Image();
+    imagens[nome].src = 'img/' + nome + '.svg';
 }
 
 /**
