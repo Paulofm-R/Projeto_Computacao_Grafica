@@ -47,13 +47,20 @@ let tirOvni_timer
 let nave = new Nave(ctx, W, H, imagens['Nave']);
 
 //function
-//carregar imagens
-function loadImage(name){
-    imagens[name] = new Image();
-    imagens[name].src = 'img/' + name + '.png';
+/**
+ * carregar imagens
+ * @param {string} name nome da imagem
+ */
+function loadImage(nome){
+    imagens[nome] = new Image();
+    imagens[nome].src = 'img/' + nome + '.png';
+    console.log(imagens);
 }
 
-//clicar numa tecla
+/**
+ * clicar numa tecla
+ * @param {*} e tecla precionada
+ */
 function KeyPressed(e){
     if (e.key == 'w'){
         wKey = true;
@@ -76,7 +83,10 @@ function KeyPressed(e){
     }
 }
 
-//lagar a tecla
+/**
+ * lagar a tecla
+ * @param {*} e tecla que estava a ser precionada
+ */
 function KeyReleased(e){
     switch (e.key){
         case "w":
@@ -94,13 +104,17 @@ function KeyReleased(e){
     }
 }
 
-//teletransportar a nave
+/**
+ * teletransportar a nave
+ */
 function teleport(){
     nave.x = Math.floor(Math.random() * W);
     nave.y = Math.floor(Math.random() * H);
 }
 
-//tempo de espera para poder teletransportar novamente
+/**
+ * tempo de espera para poder teletransportar novamente
+ */
 function teleportTimer(){
     spaceTimer--;
     if (spaceTimer == 0){
@@ -110,8 +124,8 @@ function teleportTimer(){
 
 /**
  * colisões
- * @param {object} obj1 objeto de colição um 
- * @param {object} obj2 objeto de colição dois
+ * @param {object} obj1 objeto de colição 
+ * @param {object} obj2 objeto de colição
  * @returns 
  */
 function colisoes(obj1, obj2) {
@@ -126,6 +140,12 @@ function colisoes(obj1, obj2) {
     }
 }
 
+/**
+ * colisões
+ * @param {object} tiro
+ * @param {object} obj objeto de colição
+ * @returns 
+ */
 function colisaoTiros(tiro, obj){
     if (tiro.x + tiro.t < (obj.x + obj.colisao.x) || 
         tiro.x > (obj.x + obj.colisao.x) + (obj.w + obj.colisao.w) ||
@@ -138,7 +158,9 @@ function colisaoTiros(tiro, obj){
         }
 }
 
-//criar ovni
+/**
+ * criar ovni
+ */
 function novOVNI(){
     if(!ovni.emJogo){
         ovni.criarOVNI();
@@ -146,7 +168,9 @@ function novOVNI(){
     }
 }
 
-//fazer com que o ovni dispara
+/**
+ * fazer com que o ovni dispara
+ */
 function tirOVNI(){
     if(ovni.emJogo && nave.vida){ //disparar quando o ovni e a nave estam no jogo
         ovni.disparar(nave.x, nave.y)
@@ -156,7 +180,9 @@ function tirOVNI(){
     }
 }
 
-//criar asteroides
+/**
+ * criar asteroides
+ */
 function criarAsteroides() {
     for (let i = 0; i < numAsteroides; i++) {
         let xInit;
@@ -187,11 +213,16 @@ function criarAsteroides() {
     numAsteroides += 2;
 }
 
+/**
+ * destruir/dividir asteroides 
+ * @param {int} index posição do asteroide no array
+ * @param {boolean} especial se o tiro da nave foi o tiro especial
+ */
 function destruirAsteroides(index, especial = false) {
     let x = asteroides[index].x;
     let y = asteroides[index].y;
     let estado = asteroides[index].estado;
-
+    
     if(estado < 3 && !especial){
         estado++
 
@@ -205,6 +236,9 @@ function destruirAsteroides(index, especial = false) {
     asteroides.splice(index, 1);
 }
 
+/**
+ * carregar o tiro especial
+ */
 function carregarEspecial(){
     if(especialTimer == 0) { 
         especial = true; //ativa a possibilidade de disparar
@@ -339,7 +373,7 @@ function render(){
         tiro.draw();
         tiro.update();
 
-        //retirar tiros (0.75 é um valor para ajustar quanto o tiro vai andar)
+        //retirar tiros (0.6 é um valor para ajustar quanto o tiro vai andar)
         if (tiro.distancia > W * 0.6){
             nave.tiros.shift()
         }
@@ -360,6 +394,7 @@ function render(){
         
     })
 
+    //desenhar e mover o ovni
     if(ovni.emJogo){
         ovni.draw();
         ovni.update();
@@ -420,6 +455,6 @@ canvas.addEventListener('mousedown', (e) => {
 })
 
 setInterval(novOVNI, 25000); //criar um ovni 25 em 25 segundos
-setInterval(carregarEspecial, 1000)
+setInterval(carregarEspecial, 1000) //carregar o tiro especial
 
 window.onload = () => render()  //chamar a função render depois de carregar a pagina

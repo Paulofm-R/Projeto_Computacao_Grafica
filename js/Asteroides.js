@@ -20,11 +20,16 @@ export default class Asteroides{
         this.H = H;
     }
 
+    /**
+     * desenhar os asteroides
+     */
     draw(){
-        //desenhar os asteroides
         this.ctx.drawImage(this.img, this.x, this.y);    
     }
 
+    /**
+     * atualizar a posição dos asteroides
+     */
     update(){
         //quando o asteroide passar o limite do canvas, passar para o outro lado
         if (this.x < -this.w) this.x = this.W
